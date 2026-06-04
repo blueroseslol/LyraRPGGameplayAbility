@@ -170,6 +170,10 @@
 	- [4.25.1](#4251)
 	- [4.25](#425)
 	- [4.24](#424)
+	- [5.4](#544)
+	- [5.5](#555)
+	- [5.6](#561)
+	- [5.7](#574)
 
 ---
 
@@ -3781,5 +3785,99 @@ https://docs.unrealengine.com/5.2/en-US/unreal-engine-5.2-release-notes/
 * Change: Moved some gameplay effect functionality into optional components. All existing content will automatically update to use components during PostCDOCompiled, if necessary.
 
 https://docs.unrealengine.com/5.3/en-US/unreal-engine-5.3-release-notes/
+
+**[⬆ 返回目录](#table-of-contents)**
+
+<a name="changelog-5.4"></a>
+## 5.4
+
+* New: 新增 `AbilityTask_PlayAnimAndWait`，可用于播放 `UAnimSequence`（非Montage）并通过 `SlotName` 挂载到AnimGraph等待完成。
+* New: 新增 `AbilityAsync_WaitGameplayTagCountChanged`，异步等待GameplayTag计数变化。
+* New: 新增 `AbilityTask_WaitGameplayTagCountChanged`，Task版本的Tag计数变化等待。
+* New: 新增 `AbilitySystemCheatManagerExtension`，通过CheatManager扩展GAS控制台调试命令。
+* New: 新增 `EConsiderPending` 枚举，控制 `FindAbilitySpecFromHandle()` 等函数是否考虑 PendingAdd/PendingRemove 状态的AbilitySpec。
+* New: 新增 `SetActiveGameplayEffectInhibit()`（使用移动语义 `FActiveGameplayEffectHandle&&`），明确Handle在调用后失效。
+* New: 新增 `OnGameplayEffectInhibitionChangedDelegate()` 委托，监听效果抑制状态变化。
+* New: `GetOwnedGameplayTags()` 新增返回 `const FGameplayTagContainer&` 的无拷贝重载（`[[nodiscard]]`），避免不必要的拷贝开销。
+* New: 新增 `MatchesGameplayTagQuery()` 便捷方法。
+* New: `GetBlockedAbilityTags()` 同样新增返回引用的重载以避免拷贝。
+* New: 编辑器新增 `IsDataValid()` 数据验证，检测复制变量与ReplicationPolicy配置不匹配、NetMulticast函数等问题。
+* New: 新增 `GetLifetimeReplicatedProps()` 实现，支持蓝图的复制属性列表在Ability中正常工作。
+* New: GameplayTags新增 `ParseParentTags(TArray<FGameplayTag>&)`，无需TagManager直接批量解析父级Tag，性能更好。
+* New: GameplayTags新增 `operator<<(FArchive&, FGameplayTag&)`，支持FArchive序列化。
+* New: Gameplay Debugger 从5.4起成为GAS推荐的调试方式（替代传统 `showdebug abilitysystem`），支持Gameplay Debugger和Visual Logger增强。
+* Change: 日志系统从 `ABILITY_VLOG` 宏重构为结构化 `UE_LOG` + `UE_VLOG`，并引入 `FScopedCanActivateAbilityLogEnabler` 条件控制。
+* Change: `GetSingleTagContainer()` 返回类型从 `const FGameplayTagContainer&`（引用）改为 `FGameplayTagContainer`（值语义），调用者需注意生命周期变化。
+* API Change: `InhibitActiveGameplayEffect()` 标记为废弃（`UE_DEPRECATED(5.4)`），请迁移至 `SetActiveGameplayEffectInhibit()`。
+* API Change: `ReinvokeActiveGameplayCues()` 标记为废弃（`UE_DEPRECATED(5.4)`）。
+* API Change: `AddParentsForTag` 标记为废弃（`UE_DEPRECATED(5.4)`），请使用 `ParseParentTags` 或 `ExtractParentTags` 替代。
+
+https://docs.unrealengine.com/5.4/en-US/unreal-engine-5.4-release-notes/
+
+**[⬆ 返回目录](#table-of-contents)**
+
+<a name="changelog-5.5"></a>
+## 5.5
+
+* New: 新增 `UGameplayAbilitiesDeveloperSettings`（Editor Project Settings → Gameplay Abilities Settings），将GAS全局配置迁移到统一面板，包括：
+  * `AbilitySystemGlobalsClassName`：全局AbilitySystemGlobals类配置。
+  * `GlobalAttributeSetDefaultsTableNames`：全局AttributeSet默认值曲线表。
+  * `GlobalGameplayCueManagerClass` / `GlobalGameplayCueManagerName`：GameplayCueManager类与资源配置。
+  * `GameplayCueNotifyPaths`：GameplayCue Notify扫描路径。
+  * `ReplicateActivationOwnedTags`：控制ActivationOwnedTags是否复制给Owner（false=仅本地应用，用于兼容依赖非复制行为的旧代码）。
+  * 替代原 `AbilitySystemGlobals.ini` 配置方式，支持 `ConfigRestartRequired` 标记。
+* New: 新增 `FGameplayTagTokenStore`（Iris实验性），将GameplayTag映射为紧凑的 `FNetToken` 在Iris网络系统中传输以减少带宽。
+* New: `NetSerialize_ForReplayUsingFastReplication()` 方法，支持Replay快速复制序列化。
+* New: `SetUserDescription(const FString&)` 方法，允许用户设置GameplayTagQuery的描述字符串。
+* New: 新增 `RemoveActiveGameplayEffect_AllowClientRemoval()`（protected），提供明确的客户端移除受控接口。
+* Change: Gameplay Cue 事件重命名 —— `OnActive` → `OnBurst`；`WhileActive` → `OnBecomeRelevant`；`OnRemove` → `OnCeaseRelevant`，语义更加明确。旧名称仍然可用但推荐迁移。
+* Change: NonInstanced Ability实例化策略已废弃（5.5起），推荐使用 `InstancedPerActor` 或 `InstancedPerExecution`。
+* Change: GameplayAbility蓝图复制变量已废弃（5.5起），推荐改用Reliable RPC（`FScopedServerAbilityRPCBatcher` 提供RPC批处理支持）。
+* Change: `GetAttributeSet()` 增加蓝图 `DeterminesOutputType` 元数据，改善蓝图类型推断。
+* Change: `GameplayDebuggerCategory_Abilities.h` 从Private移至Public，可公开使用。
+* Change: `SetBaseAttributeValueFromReplication()` 两个重载统一使用 `FGameplayAttributeData`（修正内部参数方向性错误）。
+* API Change: `RemoveActiveGameplayEffect_NoReturn()` 标记为废弃（`UE_DEPRECATED_FORGAME(5.5)`），请使用 `RemoveActiveGameplayEffect_AllowClientRemoval()` 替代。
+
+https://docs.unrealengine.com/5.5/en-US/unreal-engine-5.5-release-notes/
+
+**[⬆ 返回目录](#table-of-contents)**
+
+<a name="changelog-5.6"></a>
+## 5.6
+
+* Change: `UAbilitySystemComponent` 引入 `MinimalAPI` UCLASS宏，类本身不再整体导出 `GAMEPLAYABILITIES_API`，改为通过 `#define UE_API GAMEPLAYABILITIES_API` 模式按函数粒度逐一定义导出。
+* Change: 全面 `FORCEINLINE` → `inline` 替换（标签操作相关函数），改善编译时间和二进制大小。
+* Change: 清理 `#if UE_ENABLE_INCLUDE_ORDER_DEPRECATED_IN_5_2` 旧版兼容块。
+* New: `GameplayTagRedirectors.h` 新增到Public，可公开访问Tag重定向配置。
+* New: 新增 `GetTagLeafName() const`，返回GameplayTag路径最后一段的 `FName`（如 `A.B.C` → `C`）。
+* Change: `MatchesAnyExact()` 去掉 `GAMEPLAYTAGS_API`，改为非导出的内联函数。
+
+https://docs.unrealengine.com/5.6/en-US/unreal-engine-5.6-release-notes/
+
+**[⬆ 返回目录](#table-of-contents)**
+
+<a name="changelog-5.7"></a>
+## 5.7
+
+* New: 新增 `CancelAbilityTagsGameplayEffectComponent`，支持在GameplayEffect应用/执行时根据Tag条件取消目标Actor上的Ability。支持 `OnApplication` 和 `OnExecution` 两种触发模式，可分别配置"取消拥有Tag的Ability"和"取消没有Tag的Ability"。
+* New: 新增 `GameplayTagCountContainerNetSerializer`，将 `FGameplayTagCountContainer` 纳入Iris NetSerializer框架，替代旧的FFastArraySerializer方式高效复制Tag计数状态。
+* New: 新增预测 GameplayEffect 生命周期回调（protected）：
+  * `OnCaughtUpActiveGameplayEffect()`：预测GE与服务器追上时调用。
+  * `OnRejectedActiveGameplayEffect()`：预测GE被服务器拒绝时调用。
+  * `OnPredictiveGameplayEffectStackCaughtUp()`：预测GE堆栈追上时调用。
+* New: `FGameplayTagNode` 新增 `GetDevComment()`（WITH_EDITORONLY_DATA）和 `Hash(FBlake3&)`（WITH_EDITOR），用于增量Cook的确定性哈希。
+* New: `IsValidGameplayTagString` 新增多重载（接受 `const TCHAR*` 和 `FStringView`），改善字符串验证的灵活性。
+* New: 官方在GameplayAbilities插件目录下新增 `README.md`（293行），涵盖GAS核心概念综述、ASC放置建议、实例化策略详解、RPC批处理指南、GameplayCue事件语义、调试工具指南等完整内容。
+* API Change: **破坏性变更** —— 删除 `AddReplicatedLooseGameplayTag()` / `AddReplicatedLooseGameplayTags()` / `RemoveReplicatedLooseGameplayTag()` / `RemoveReplicatedLooseGameplayTags()` / `SetReplicatedLooseGameplayTagCount()` 一整套函数。统一通过新的 `EGameplayTagReplicationState` 参数控制Tag复制状态（在 `AddLooseGameplayTag()` / `RemoveLooseGameplayTag()` 等所有LooseTag函数中）。
+* API Change: `UpdateTagMap()` 签名增加强制的 `EGameplayTagReplicationState` 参数（非向后兼容），新增 `UpdateTagMapSingle_Internal()` 和 `UpdateTagMap_Internal()` 统一内部实现路径。
+* API Change: `GetBlockedAbilityTags()` 返回类型从 `const FGameplayTagContainer&` 改为 `FGameplayTagContainer`（值返回）。
+* API Change: `MinimalReplicationTags` 和 `ReplicatedLooseTags` 标注 `UE_DEPRECATED(5.7)`，将由统一的 `FGameplayTagCountContainer`（现为 `UPROPERTY(Replicated)`）取代。
+* API Change: `GetSubobjectsWithStableNamesForNetworking()` 已移除。
+* API Change: `BlockedAbilityBindings`（原标注 `UE_DEPRECATED(4.26)`）从protected移至private。
+* API Change: 大规模 `FORCEINLINE` → `inline` 替换（GameplayTags所有核心操作函数： `operator==`、`operator!=`、`MatchesTagExact`、`IsValid`、`HasTag`、`HasTagExact` 等）。
+* API Change: 删除废弃已久的 `EGameplayTagMatchType` 命名空间（原标注 `UE_DEPRECATED(5.0)`）。
+* Bug Fix: `FGameplayTagNode` 条件编译修复，非编辑器版本中 `IsExplicitTag()`、`GetAllowNonRestrictedChildren()`、`IsRestrictedGameplayTag()` 补充缺失的 `else` 分支，避免编译错误。
+
+https://docs.unrealengine.com/5.7/en-US/unreal-engine-5.7-release-notes/
 
 **[⬆ 返回目录](#table-of-contents)**
