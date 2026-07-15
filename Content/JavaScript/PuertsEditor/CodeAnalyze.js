@@ -54,7 +54,7 @@ function getCustomSystem() {
         throw new Error("exit with code:" + exitCode);
     }
     function getExecutingFilePath() {
-        return getCurrentDirectory() + "Content/JavaScript/PuertsEditor/node_modules/typescript/lib/tsc.js";
+        return cpp.FPuertsEditorModule.GetTypeScriptCompilerPath();
     }
     function getCurrentDirectory() {
         return UE.FileSystemOperation.GetCurrentDirectory();
@@ -70,17 +70,16 @@ function getCustomSystem() {
     return customSystem;
 }
 let customSystem = getCustomSystem();
-if (!ts.sys) {
-    let t = ts;
-    t.sys = customSystem;
-}
+const compilerSystem = ts.sys || customSystem;
 function logErrors(allDiagnostics) {
     allDiagnostics.forEach(diagnostic => {
         let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
         if (diagnostic.file) {
             let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+            console.error(`  Error ${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
         }
         else {
+            console.error(`  Error: ${message}`);
         }
     });
 }
@@ -203,11 +202,11 @@ function readAndParseConfigFile(configFilePath) {
         fileExists: customSystem.fileExists,
         readFile: customSystem.readFile,
         trace: s => { }
-    }, customSystem.getCurrentDirectory());
+    }, tsi.getDirectoryPath(configFilePath));
 }
 function watch(configFilePath) {
     let { fileNames, options } = readAndParseConfigFile(configFilePath);
-    const versionsFilePath = tsi.getDirectoryPath(configFilePath) + "/ts_file_versions_info.json";
+    const versionsFilePath = configFilePath + ".versions.json";
     const fileVersions = {};
     let beginTime = new Date().getTime();
     fileNames.forEach(fileName => {
@@ -261,11 +260,11 @@ function watch(configFilePath) {
         getCurrentDirectory: customSystem.getCurrentDirectory,
         getCompilationSettings: () => options,
         getDefaultLibFileName: options => tsi.combinePaths(getDefaultLibLocation(), ts.getDefaultLibFileName(options)),
-        fileExists: ts.sys.fileExists,
-        readFile: ts.sys.readFile,
-        readDirectory: ts.sys.readDirectory,
-        directoryExists: ts.sys.directoryExists,
-        getDirectories: ts.sys.getDirectories,
+            fileExists: compilerSystem.fileExists,
+            readFile: compilerSystem.readFile,
+            readDirectory: compilerSystem.readDirectory,
+            directoryExists: compilerSystem.directoryExists,
+            getDirectories: compilerSystem.getDirectories,
     };
     let service = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
     function getProgramFromService() {
@@ -387,7 +386,7 @@ function watch(configFilePath) {
         }
     }
     var dirWatcher = new UE.PEDirectoryWatcher();
-    global.__dirWatcher = dirWatcher; //prevent it from being released?
+    global.__dirWatchers = global.__dirWatchers || []; global.__dirWatchers.push(dirWatcher);
     dirWatcher.OnChanged.Add((added, modified, removed) => {
         setTimeout(() => {
             var changed = false;
@@ -1034,7 +1033,18 @@ function watch(configFilePath) {
         else {
         }
     }
-    cpp.FPuertsEditorModule.SetCmdCallback(dispatchCmd);
+    return dispatchCmd;
 }
-watch(customSystem.getCurrentDirectory() + "tsconfig.json");
+const configPaths = cpp.FPuertsEditorModule.GetTypeScriptConfigPaths().split("\n");
+const commandDispatchers = [];
+for (const configPath of configPaths) {
+    if (!customSystem.fileExists(configPath)) {
+        console.warn(`skip missing TypeScript config: ${configPath}`);
+        continue;
+    }
+    commandDispatchers.push(watch(configPath));
+}
+cpp.FPuertsEditorModule.SetCmdCallback((cmd, args) => {
+    commandDispatchers.forEach(dispatch => dispatch(cmd, args));
+});
 //# sourceMappingURL=CodeAnalyze.js.map

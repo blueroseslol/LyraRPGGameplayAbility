@@ -5,3 +5,5 @@ Platforms
 *.sln
 Saved
 Build
+Developer/TypeScript/node_modules
+Developer/TypeScript/*.versions.json
