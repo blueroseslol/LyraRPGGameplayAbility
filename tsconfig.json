@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "useDefineForClassFields": false,
+        "jsx": "react",
+        "sourceMap": true,
+        "baseUrl": ".",
+        "typeRoots": [
+            "Typing",
+            "./node_modules/@types"
+        ],
+        "paths": {
+            "@matrix/puerts-runtime": [
+                "Plugins/EasyEditorPlugin/Typing/@matrix/puerts-runtime/index"
+            ]
+        },
+        "outDir": "Content/JavaScript"
+    },
+    "include": [
+        "TypeScript/**/*"
+    ]
+}

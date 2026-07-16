@@ -7,3 +7,5 @@ Saved
 Build
 Developer/TypeScript/node_modules
 Developer/TypeScript/*.versions.json
+Content/JavaScript/PuertsEditor/node_modules
+Content/JavaScript/PuertsEditor/package-lock.json
