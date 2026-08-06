@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CommonGameInstance.h"
+#include "JsEnv.h"
 
 #include "LyraGameInstance.generated.h"
 
@@ -37,6 +38,8 @@ protected:
 
 	/** A hard-coded encryption key used to try out the encryption code. This is NOT SECURE, do not use this technique in production! */
 	TArray<uint8> DebugTestEncryptionKey;
+
+	TSharedPtr<puerts::FJsEnv> GameScript;
 };
 
 #undef UE_API
