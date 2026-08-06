@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "04_Lyra/Lyra项目结构与模块逻辑.md",
+                "file": "04_Lyra/Lyra GAS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Lyra项目结构与模块逻辑"
+              "title": "Lyra GAS"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "文件列表"
@@ -185,12 +187,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "d6c5421fb4369a33",
+  "active": "cfff360917ddeef7",
   "lastOpenFiles": [
+    "04_Lyra/Lyra项目结构与模块逻辑.md",
+    "03_UEFeatureDocs/GameFeature.md",
     "03_UEFeatureDocs/GASDocument_EN.md",
     "04_Lyra/Lyra Game流程.md.tmp.41820.50fcb61de7be",
     "04_Lyra/Lyra Game流程.md",
-    "04_Lyra/Lyra项目结构与模块逻辑.md",
     "04_Lyra/Lyra GAS.md",
     "04_Lyra/Network",
     "04_Lyra/Inventory/Item & Weapon.md",
@@ -198,7 +201,6 @@
     "未命名",
     "04_Lyra/Lyra GAS.md.tmp.41820.4314d4599e1a",
     "04_Lyra/Lyra GameFeature.md",
-    "03_UEFeatureDocs/GameFeature.md",
     "03_UEFeatureDocs/GASDocument_CN.md",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/ReactUMG",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/Puerts/ThirdParty/v8_for_ue424_or_below/Lib/iOS/arm64/libv8_libsampler.a",
