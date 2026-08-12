@@ -14,20 +14,20 @@
 
 ## 2. 里程碑 M1：Lyra 基线缺陷修复（阻塞后续全部里程碑）
 
-- [ ] 2.1 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 实现 `FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)`，与既有 `AddEntry(ItemDef, StackCount)` 保持一致的子对象注册、`MarkItemDirty` 与消息广播语义；验证：编译通过 + 新增 `LyraGame.Inventory.AddItemInstance` Automation 测试覆盖「加入后可查询到实例」「StatTags 保持」两个断言。
-- [ ] 2.2 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 补齐 `AddItemInstance` 的公开入口，使 `UPickupableStatics::AddPickupToInventory` 的 `Instances` 分支不再走到未实现路径；验证：扩展同组 Automation 测试。
-- [ ] 2.3 在 `Source/LyraGame/System/LyraGameInstance.cpp:93` 将 `GameScript->WaitDebugger()` 改为由配置控制且默认关闭（新增配置项或复用 `Config/DefaultPuerts.ini` 的 `DebugEnable` 语义）；验证：编译通过，并在无调试器环境下启动 Dedicated Server 观察不阻塞（联机验收，记入矩阵）。
-- [ ] 2.4 修正 `Config/DefaultPuerts.ini`：移除或修正指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把项目根 `tsconfig.json`（实际编译 `TypeScript/Main.ts` 者）加入 `TypeScriptConfigPaths`；验证：INI 解析成功，编辑器启动无缺失路径告警，需要 Unreal Editor。
-- [ ] 2.5 同步 `TypeScript/Main.ts` 与 `Content/JavaScript/Main.js`：确认源码为期望状态后重新构建，使产物不再执行源码中已注释的 `GameplayRuntime` 实例化；验证：在 `Developer/TypeScript` 执行 `npm run typecheck` 与 `npm run build`，比对产物内容。
-- [ ] 2.6 编译 LyraGame 完整变更；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`，不以 Live Coding 结果替代完整编译。
-- [ ] 2.7 运行 M1 的 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory;Quit" -unattended -nopause`。
+- [x] 2.1 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 实现 `FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)`，与既有 `AddEntry(ItemDef, StackCount)` 保持一致的子对象注册、`MarkItemDirty` 与消息广播语义；验证：编译通过 + 新增 `LyraGame.Inventory.AddItemInstance` Automation 测试覆盖「加入后可查询到实例」「StatTags 保持」两个断言。
+- [x] 2.2 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 补齐 `AddItemInstance` 的公开入口，使 `UPickupableStatics::AddPickupToInventory` 的 `Instances` 分支不再走到未实现路径；验证：扩展同组 Automation 测试。
+- [x] 2.3 在 `Source/LyraGame/System/LyraGameInstance.cpp:94` 注释 `GameScript->WaitDebugger()`（用户决定采用直接注释方案，不做配置化），使无调试器环境下 Dedicated Server 启动不阻塞；验证：编译通过，并在无调试器环境下启动 Dedicated Server 观察不阻塞（联机验收，记入矩阵）。
+- [ ] 2.4 修正 `Config/DefaultPuerts.ini`：移除或修正指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把项目根 `tsconfig.json`（实际编译 `TypeScript/Main.ts` 者）加入 `TypeScriptConfigPaths`；验证：INI 解析成功，编辑器启动无缺失路径告警，需要 Unreal Editor。**（用户否决：不修改 `Config/DefaultPuerts.ini`，维持原状；PuerTS 编辑器 watch 仍指向不存在的 tsconfig，不影响编译与运行时，不再实施）**
+- [ ] 2.5 同步 `TypeScript/Main.ts` 与 `Content/JavaScript/Main.js`：确认源码为期望状态后重新构建，使产物不再执行源码中已注释的 `GameplayRuntime` 实例化；验证：在 `Developer/TypeScript` 执行 `npm run typecheck` 与 `npm run build`，比对产物内容。**（用户否决：`Content/JavaScript` 为构建自动生成产物，不手动改动/提交；产物由用户构建流程管理，不再实施）**
+- [x] 2.6 编译 LyraGame 完整变更；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`，不以 Live Coding 结果替代完整编译。
+- [x] 2.7 运行 M1 的 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory;Quit" -unattended -nopause`。
 
 ## 3. 里程碑 M2：三插件复制与命名空间迁移
 
-- [ ] 3.1 复制 `Plugins/GameFeatures/ShooterCore/` 为 `Plugins/GameFeatures/PalworldCore/`，重命名 `.uplugin`、`Source/ShooterCoreRuntime/` 为 `Source/PalworldCoreRuntime/`，同步修改 `Build.cs` 模块名、`IMPLEMENT_MODULE` 与所有 `SHOOTERCORERUNTIME_API` 宏；验证：`Build.bat LyraEditor Win64 Development ... -WaitMutex` 编译通过。
+- [ ] 3.1 复制 `Plugins/GameFeatures/ShooterCore/` 为 `Plugins/GameFeatures/PalworldCore/`，重命名 `.uplugin`、`Source/ShooterCoreRuntime/` 为 `Source/PalworldCoreRuntime/`，同步修改 `Build.cs` 模块名、`IMPLEMENT_MODULE` 与所有 `SHOOTERCORERUNTIME_API` 宏；**并重命名全部 12 个类（`Lyra*`/`AimAssist*`/`AssistProcessor`/`Elim*Processor`/`TDM_PlayerSpawningManagmentComponent`/`ControlPointStatusMessage` → `Pal*` 前缀）及对应头文件与 `.generated.h` include——两个模块同时加载时同名 UClass 会 FName 冲突，类名重命名是必须项**；验证：`Build.bat LyraEditor Win64 Development ... -WaitMutex` 编译通过。
 - [ ] 3.2 复制 `Plugins/GameFeatures/ShooterExplorer/` 为 `Plugins/GameFeatures/PalworldExplorer/`（纯内容插件，无 Source），`.uplugin` 依赖改为 `PalworldCore`；验证：JSON 解析成功，Plugin Browser 可识别，需要 Unreal Editor。
 - [ ] 3.3 复制 `Plugins/GameFeatures/ShooterMaps/` 为 `Plugins/GameFeatures/PalworldMaps/`（纯内容插件），`.uplugin` 依赖改为 `PalworldCore`；验证：同 3.2。
-- [ ] 3.4 在三个插件的 `Config/Tags/*.ini` 中把玩法专属 Tag 由 `ShooterGame.*` 迁移为 `Palworld.*`；`InputTag.*`、`HUD.Slot.*` 等跨玩法通用 Tag 沿用 ShooterCore 既有定义，不重复注册；验证：启动 Editor 检查无重复定义/缺失 GameplayTag 日志，需要 Unreal Editor。
+- [ ] 3.4 在三个插件的 `Config/Tags/*.ini` 中把玩法专属 Tag 由 `ShooterGame.*` 迁移为 `Palworld.*`；`InputTag.*`、`HUD.Slot.*` 等跨玩法通用 Tag 沿用 ShooterCore 既有定义，不重复注册；验证：启动 Editor 检查无重复定义/缺失 GameplayTag 日志，需要 Unreal Editor。**（用户决策：玩法专属 Tag 保留原名，ini 原样复制定义——`.uasset` 内 Tag 值为硬编码字符串，命令行/内置工具无法批量替换，保留原名使复制资产零改动即可独立运行；新增玩法 Tag（如 M5 的 `Palworld.GamePhase.*`）统一使用 `Palworld.*` 前缀，不修改旧名定义）**
 - [ ] 3.5 在 Unreal Editor 中对三个 Palworld 插件的 Content 执行资产重定向与 Fix Up Redirectors，确保 Palworld 资产不再引用 ShooterCore/ShooterExplorer/ShooterMaps；验证：引用审计（Reference Viewer 或 `-run=ResavePackages` 报告）显示零跨插件引用，需要 Unreal Editor。
 - [ ] 3.6 回归验证原 Shooter 三件套未被破坏：启动原 ShooterCore Elimination Experience 完成一局；验证：单客户端 PIE + Standalone，记入验收矩阵的「原 Shooter 回归」行，需要 Unreal Editor。
 - [ ] 3.7 验证 Palworld 插件可独立运行：停用 Shooter 三插件后启动 Palworld Experience；验证：需要 Unreal Editor，对应 `palworld-gamefeature-shells` 的「仅启用 Palworld 玩法」场景。

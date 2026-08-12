@@ -109,7 +109,20 @@ ULyraInventoryItemInstance* FLyraInventoryList::AddEntry(TSubclassOf<ULyraInvent
 
 void FLyraInventoryList::AddEntry(ULyraInventoryItemInstance* Instance)
 {
-	unimplemented();
+	check(Instance != nullptr);
+	check(OwnerComponent);
+
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+
+	FLyraInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+	NewEntry.Instance = Instance;
+	// An instance-based entry represents a single item; fragments were already
+	// run when the instance was created by its producer (e.g. a pickup or a
+	// corpse bag), so OnInstanceCreated must not be re-run here.
+	NewEntry.StackCount = 1;
+
+	MarkItemDirty(NewEntry);
 }
 
 void FLyraInventoryList::RemoveEntry(ULyraInventoryItemInstance* Instance)
