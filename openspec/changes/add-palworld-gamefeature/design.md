@@ -30,7 +30,7 @@
 
 - 每个 `ULyraGameInstance` 创建一个 `FJsEnv`（`Source/LyraGame/System/LyraGameInstance.cpp:93`），模块根为 `Content/JavaScript`。
 - 同一位置调用 `GameScript->WaitDebugger()`，在 Init 阶段同步阻塞等待调试器。
-- `Config/DefaultPuerts.ini` 注册的 `Developer/TypeScript/tsconfig.json` 不存在；真正编译 `TypeScript/Main.ts` 的根 `tsconfig.json` 未进入 watch 列表。
+- `Config/DefaultPuerts.ini` 曾注册不存在的 `Developer/TypeScript/tsconfig.json`（EasyEditorPlugin 迭代加入）；2026-08-12 已恢复原生设置，回落默认 `tsconfig.json`（项目根，编译 `TypeScript/Main.ts`）。
 - `TypeScript/Main.ts` 已注释掉 `GameplayRuntime` 实例化，但 `Content/JavaScript/Main.js` 仍是含实例化的旧版本。
 - `Typing/ue/ue.d.ts` 已覆盖 `LyraInventoryManagerComponent`、`LyraGamePhaseSubsystem`、`LyraTeamSubsystem`、`CommonSessionSubsystem` 等 Lyra 类型。
 

@@ -1,6 +1,6 @@
-## 变更状态：已废弃（2026-08-12）
+## 变更状态：方向修订（2026-08-12）
 
-> **⚠️ 本变更已废弃**：M2 复制 Shooter→Palworld 三插件导致同名资产冲突、ShooterGame 无法使用，已删除 PalworldCore/Explorer/Maps 并移除 uproject 注册。**保留项**：M0 文档记录（基线/边界/验收矩阵）；M1 基线修复（`AddEntry(ItemInstance)`、`WaitDebugger` 注释、`LyraGame.Inventory.AddItemInstance` 测试）已并入 ShooterGame 持续有效；M2 执行记录（tasks.md 3.1-3.8）作为「方案不可行」教训保留。**作废项**：M3-M9 全部任务。详见 proposal.md 顶部废弃标注。
+> **⚠️ 方案调整**：M2 复制 Shooter→Palworld 三插件导致同名资产冲突、ShooterGame 无法使用，已删除 PalworldCore/Explorer/Maps 并移除 uproject 注册。**改为直接在 ShooterGame 上开发**，保留「搜打撤 + 分队对抗」玩法目标。**保留项**：M0 文档记录（基线/边界/验收矩阵）；M1 基线修复（`AddEntry(ItemInstance)`、`WaitDebugger` 注释、`LyraGame.Inventory.AddItemInstance` 测试、GameInstance Shutdown 释放 FJsEnv）已并入 ShooterGame 持续有效；M2 执行记录（3.1-3.8）作为「方案不可行」教训保留。**M3 按新方向重定向继续（见第 4 节）；M4-M9 待后续按「直接在 ShooterGame 上开发」重定向规划**。详见 proposal.md 顶部方向修订标注。
 
 ## 0. 约定
 
@@ -21,8 +21,8 @@
 - [x] 2.1 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 实现 `FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)`，与既有 `AddEntry(ItemDef, StackCount)` 保持一致的子对象注册、`MarkItemDirty` 与消息广播语义；验证：编译通过 + 新增 `LyraGame.Inventory.AddItemInstance` Automation 测试覆盖「加入后可查询到实例」「StatTags 保持」两个断言。
 - [x] 2.2 在 `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp` 补齐 `AddItemInstance` 的公开入口，使 `UPickupableStatics::AddPickupToInventory` 的 `Instances` 分支不再走到未实现路径；验证：扩展同组 Automation 测试。
 - [x] 2.3 在 `Source/LyraGame/System/LyraGameInstance.cpp:94` 注释 `GameScript->WaitDebugger()`（用户决定采用直接注释方案，不做配置化），使无调试器环境下 Dedicated Server 启动不阻塞；验证：编译通过，并在无调试器环境下启动 Dedicated Server 观察不阻塞（联机验收，记入矩阵）。
-- [ ] 2.4 修正 `Config/DefaultPuerts.ini`：移除或修正指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把项目根 `tsconfig.json`（实际编译 `TypeScript/Main.ts` 者）加入 `TypeScriptConfigPaths`；验证：INI 解析成功，编辑器启动无缺失路径告警，需要 Unreal Editor。**（用户否决：不修改 `Config/DefaultPuerts.ini`，维持原状；PuerTS 编辑器 watch 仍指向不存在的 tsconfig，不影响编译与运行时，不再实施）**
-- [ ] 2.5 同步 `TypeScript/Main.ts` 与 `Content/JavaScript/Main.js`：确认源码为期望状态后重新构建，使产物不再执行源码中已注释的 `GameplayRuntime` 实例化；验证：在 `Developer/TypeScript` 执行 `npm run typecheck` 与 `npm run build`，比对产物内容。**（用户否决：`Content/JavaScript` 为构建自动生成产物，不手动改动/提交；产物由用户构建流程管理，不再实施）**
+- [ ] 2.4 修正 `Config/DefaultPuerts.ini`：移除或修正指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把项目根 `tsconfig.json`（实际编译 `TypeScript/Main.ts` 者）加入 `TypeScriptConfigPaths`；验证：INI 解析成功，编辑器启动无缺失路径告警，需要 Unreal Editor。**（2026-08-12 已解决：用户授权恢复 Puerts 设置，移除 EasyEditorPlugin 迭代加入的三条 `Developer/TypeScript/*` TypeScriptConfigPaths，回落原生默认 `tsconfig.json`）**
+- [ ] 2.5 同步 `TypeScript/Main.ts` 与 `Content/JavaScript/Main.js`：确认源码为期望状态后重新构建，使产物不再执行源码中已注释的 `GameplayRuntime` 实例化；验证：在项目根执行 `npm run typecheck` 与 `npm run build`，比对产物内容。**（用户否决：`Content/JavaScript` 为构建自动生成产物，不手动改动/提交；产物由用户构建流程管理，不再实施）**
 - [x] 2.6 编译 LyraGame 完整变更；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`，不以 Live Coding 结果替代完整编译。
 - [x] 2.7 运行 M1 的 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory;Quit" -unattended -nopause`。
 
@@ -37,14 +37,16 @@
 - [ ] 3.7 验证 Palworld 插件可独立运行：停用 Shooter 三插件后启动 Palworld Experience；验证：需要 Unreal Editor，对应 `palworld-gamefeature-shells` 的「仅启用 Palworld 玩法」场景。
 - [ ] 3.8 **（推迟，用户决策 2026-08-12）** 手动修复残留 `/Shooter*` 跨插件引用：① **Palworld 关卡的 WorldPartition 指向 ShooterGame 地图的外部文件**——三张 Palworld 地图 `L_Expanse`/`L_Convolution_Blockout`/`L_Expanse_Blockout` 的 `.umap` 需把 WorldPartition 引用从 `/ShooterMaps/__ExternalActors__/Maps/<MapName>/` 改指 `/PalworldMaps/__ExternalActors__/Maps/<MapName>/`（使地图指向自身副本），同时把 PalworldMaps 的 `__ExternalActors__`/`__ExternalObjects__` 副本内部的 `/ShooterMaps/Maps/<MapName>` 改指 `/PalworldMaps/Maps/<MapName>`（约 3 万处），`L_ShooterFrontendBackground.umap`（168 处）同理——需在编辑器加载地图后执行 Replace References / 重存（脚本无法处理：加载 ExternalActor 包触发 UE 5.7 异步加载器原生断言崩溃）；② 主内容子对象路径（`:MovieScene_0...DisplayName` 等）、硬类引用（`TSubclassOf`）、Niagara 元数据字符串——`rename_referencing_soft_object_paths` 只做精确 FSoftObjectPath 匹配，无法脚本修复；③ PalworldCore GF 的 GameFeatureAction 仍引用 ShooterCore 资产（`B_AimAssistTargetManager`/`B_HandleShooterReplays`/`B_EliminationFeedRelay`/`IMC_ShooterGame`）——其中 `B_AimAssistTargetManager` 等指向已删玩法，需在编辑器删除或改指；执行时机：M2 3.7 停用 Shooter 前，或 M4 重建 PalworldMaps 地图时，逐一用编辑器工具清理并回归。
 
-## 4. 里程碑 M3：GameFeature TypeScript 构建与生命周期
+## 4. 里程碑 M3：GameFeature TypeScript 构建与生命周期（重定向到 ShooterGame，2026-08-12）
 
-- [ ] 4.1 在 `Developer/TypeScript/` 新增 GameFeature TypeScript 配置，以 Palworld 插件的 TypeScript 目录为输入、`Content/JavaScript/GameFeatures` 为输出，并在 `Config/DefaultPuerts.ini` 注册；验证：JSON/INI 解析成功。
-- [ ] 4.2 更新 `Developer/TypeScript/package.json` 的 `build` 与 `typecheck` 脚本纳入新配置，且不改变根 `tsconfig.json` 的既有产出；验证：在 `Developer/TypeScript` 执行 `npm run typecheck` 与 `npm run build`。
-- [ ] 4.3 在 `Source/LyraGame/LyraGame.Build.cs` 将 `Content/JavaScript/GameFeatures/**/*.js|json` 作为 NonUFS RuntimeDependencies 递归 staging；验证：编译通过，并在 M9 的 Stage 目录检查中确认产物存在。
-- [ ] 4.4 实现 GameFeature 脚本模块的注册、激活状态重放、幂等激活与对称释放（含 DisposableScope 释放委托、Timer 与弱 World 引用）；验证：`npm run typecheck` + TypeScript contract tests 覆盖「重复激活」「重复停用」「VM 重启后重建一次」。
+> **最终状态说明（2026-08-12）**：已迁移到**原生 PuerTS**——GameFeature TS 位于 `TypeScript/GameFeatures/`，由**根 `tsconfig.json`** 编译到 `Content/JavaScript/GameFeatures/`（匹配 4.3 staging）；npm 工作区在**项目根**（`package.json` + `node_modules/typescript`）；**已移除 EasyEditorPlugin**（解除链接、清除 `PuertsRuntimePlugin` 依赖、`@matrix/puerts-runtime` 引用）；**已恢复 `Config/DefaultPuerts.ini`**（移除 EasyEditorPlugin 迭代加入的 `Developer/TypeScript/*` TypeScriptConfigPaths，回落原生默认 `tsconfig.json`）。
+
+- [x] 4.1 原生 TS 构建：`TypeScript/GameFeatures/**` 由根 `tsconfig.json` 编译到 `Content/JavaScript/GameFeatures`（无需独立 gamefeatures tsconfig）；验证：`npm run typecheck`（项目根）通过。**（已实施：根 tsconfig `include: ["TypeScript/**/*"]` 覆盖 GameFeatures）**
+- [x] 4.2 项目根 `package.json` 的 `build` 与 `typecheck` 脚本指向根 `tsconfig.json`，不改变其既有产出（Main.js）；验证：在**项目根**执行 `npm run typecheck` 与 `npm run build`。
+- [x] 4.3 PuerTS 脚本打包 staging：在 `Config/DefaultGame.ini` 的 `[/Script/UnrealEd.ProjectPackagingSettings]` 添加 `+DirectoriesToAlwaysStageAsNonUFS=(Path="Content/JavaScript")`，使整个 `Content/JavaScript/`（Main.js、GameFeatures/、puerts 运行时库）以 NonUFS 松散文件进包、保留相对结构；**不再在 `LyraGame.Build.cs` 用 RuntimeDependencies**（打包设置覆盖面更完整且无需 C++ 改动）；验证：编译通过，M9 的 Cook/Stage 检查确认 `Content/JavaScript/` 产物存在。
+- [x] 4.4 实现 GameFeature 脚本模块的注册、激活状态重放、幂等激活与对称释放（含 DisposableScope 释放委托、Timer 与弱 World 引用），逻辑可脱离 UE 运行时测试；验证：`npm run typecheck` + TypeScript contract tests 覆盖「重复激活」「重复停用」「VM 重启后重建一次」（已实施：`TypeScript/GameFeatures/` 15 个 contract tests 全部通过）。
 - [ ] 4.5 以最小方式接入 `TypeScript/Main.ts`（保留用户既有代码，只增加一次 bootstrap 调用）；验证：`npm run typecheck`，并在 PIE 多实例下确认每个 GameInstance 独立启动一次，需要 Unreal Editor。
-- [ ] 4.6 在两个 Palworld 内容插件的 TypeScript 目录建立只含 activate/deactivate 的入口与服务组装根；验证：`npm run typecheck`，停用后作用域内无残留注册。
+- [ ] 4.6 为 ShooterGame 建立 GameFeature TS 入口（activate/deactivate 入口 + 服务组装根，替代原 Palworld 内容插件入口）；验证：`npm run typecheck`，停用后作用域内无残留注册。
 
 ## 5. 里程碑 M4：区域传送与玩家区域状态
 
@@ -118,7 +120,7 @@
 
 ## 10. 里程碑 M9：最终验证与交付
 
-- [ ] 10.1 执行完整 TypeScript 验证；验证：在 `Developer/TypeScript` 执行 `npm run typecheck`、`npm run build` 与全部 contract tests，并确认 `Content/JavaScript/GameFeatures` 下 Palworld 脚本产物存在。
+- [ ] 10.1 执行完整 TypeScript 验证；验证：在项目根执行 `npm run typecheck`、`npm run build` 与全部 contract tests，并确认 `Content/JavaScript/GameFeatures` 下脚本产物存在。
 - [ ] 10.2 执行完整 C++ 编译；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`。
 - [ ] 10.3 执行全部 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory+PalworldCore;Quit" -unattended -nopause`。
 - [ ] 10.4 执行 Development Cook/Stage，确认 Stage 目录同时包含 PuerTS runtime 包、`Main` 脚本与 Palworld GameFeature 脚本产物；验证：`RunUAT.bat BuildCookRun -project=D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -skiparchive`，无缺失 Primary Asset 或 GameplayTag 日志。

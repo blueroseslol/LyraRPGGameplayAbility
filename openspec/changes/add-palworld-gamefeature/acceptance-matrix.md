@@ -12,7 +12,7 @@
 | 维度 | 命令 / 方式 |
 |---|---|
 | C++ 编译 | `D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`（源码引擎替换为 `D:/UnrealEngine/UnrealEngine5`） |
-| TS typecheck | 在 `Developer/TypeScript` 执行 `npm run typecheck`（Node 需 `export PATH="/c/nvm4w/nodejs:$PATH"`） |
+| TS typecheck | 在项目根执行 `npm run typecheck`（Node 需 `export PATH="/c/nvm4w/nodejs:$PATH"`） |
 | Automation | `D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests <Filter>;Quit" -unattended -nopause` |
 | Editor 资产 | Unreal Editor 内操作：重定向、GameplayTag 检查、Reference Viewer、PIE |
 | Cook/Stage | `D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/RunUAT.bat BuildCookRun -project=D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -skiparchive` |
@@ -48,9 +48,11 @@
 - Editor 资产：插件可被识别（8 个 GameFeature 全部 Registered）；Tag 无重复定义/缺失；Duplicate PrimaryAssetID 已修复（13 个主数据资产重命名 + PalworldMaps/Explorer 取消 `Map` 类型注册 + 删除损坏的 `PalworldMaps_Label` + 移除 `GameFeatureAction_DataRegistry`）；资产重定向**部分完成**——主内容简单软引用已修复，「零跨插件引用」未达成：残留为 Palworld 关卡（L_Expanse/L_Convolution_Blockout/L_Expanse_Blockout）的 WorldPartition 指向 ShooterGame 地图的外部文件 + 主内容子对象/硬类/元数据引用，已按用户决策（2026-08-12，现阶段不剥离 Shooter 引用）推迟到后续阶段手动修复，详见 tasks.md 3.5 ⑥ / 3.8。
 - Standalone：原 ShooterCore Elimination Experience 完成一局；Palworld 插件独立可启动。
 
-### M3 GameFeature TS 构建
+### M3 GameFeature TS 构建（2026-08-12 重定向到 ShooterGame）
 
-- C++ 编译：`Content/JavaScript/GameFeatures/**/*.js|json` 作为 NonUFS RuntimeDependencies 纳入。
+> 原面向 Palworld 三插件；废弃后改为「直接在 ShooterGame 上开发」，TS 生命周期基础设施与插件无关、保留，4.1/4.6 已按项目内通用 GameFeature TS 目录与 ShooterGame 入口重定向（不修改 `Config/DefaultPuerts.ini`）。
+
+- C++ 编译：`Content/JavaScript/` 通过打包设置（`DirectoriesToAlwaysStageAsNonUFS`）作为 NonUFS 纳入，而非 Build.cs RuntimeDependencies。
 - TS typecheck + contract tests：覆盖「重复激活」「重复停用」「VM 重启后重建一次」。
 - Editor 资产：PIE 多实例下每个 GameInstance 独立启动一次脚本。
 

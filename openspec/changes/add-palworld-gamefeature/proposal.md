@@ -1,14 +1,14 @@
-> **状态：已废弃（Abandoned）**
+> **状态：方向修订（2026-08-12）**
 >
-> 本变更于 2026-08-12 废弃：M2「复制 Shooter→Palworld 三插件」方案实施后，Palworld 复制资产与 Shooter 原版**同名**（Experience/Blueprint/地图等资产名与 PrimaryAssetId 相同），两个插件同时加载时生成类冲突、AssetManager Duplicate PrimaryAssetID，导致 ShooterGame 无法正常使用。经决策：**废弃 Palworld 三插件，直接在 ShooterGame 上开发**。
+> 原「复制 Shooter→Palworld 三插件」方案实施后，Palworld 复制资产与 Shooter 原版**同名**（Experience/Blueprint/地图等资产名与 PrimaryAssetId 相同），两个插件同时加载时生成类冲突、AssetManager Duplicate PrimaryAssetID，导致 ShooterGame 无法正常使用。经决策：**废弃 Palworld 三插件，改为直接在 ShooterGame 上开发**（保留原「搜打撤 + 分队对抗」的玩法目标，但直接在 ShooterCore/ShooterExplorer/ShooterMaps 上实现，不复制平行插件）。
 >
-> 已执行的回滚：删除 `Plugins/GameFeatures/PalworldCore`（含 `PalworldCoreRuntime` C++ 模块）、`PalworldExplorer`、`PalworldMaps`；从 `LyraStarterGame.uproject` Plugins 移除三个条目；`LyraEditor` 重新编译通过。Shooter 三件套与 TopDownArena 保持原样（git 无改动）。
+> 已执行：删除 `Plugins/GameFeatures/PalworldCore`（含 `PalworldCoreRuntime` C++ 模块）、`PalworldExplorer`、`PalworldMaps`；从 `LyraStarterGame.uproject` 移除三个条目；`LyraEditor` 重新编译通过。Shooter 三件套与 TopDownArena 保持原样（git 无改动）。OpenSpec 原 M3-M9 任务按新方向**重定向**（以 tasks.md 为准），不再作废。
 >
-> 本变更中仍然有效、并已保留在 ShooterGame 上的改进：M1 基线缺陷修复——`FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)` 实现、`LyraGameInstance.cpp` 注释 `WaitDebugger()`、`LyraGame.Inventory.AddItemInstance` Automation 测试（这些修复对 ShooterGame 同样有益，未随废弃回退）。
+> 保留并已并入 ShooterGame 的改进：M1 基线缺陷修复——`FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)` 实现、`LyraGameInstance.cpp` 注释 `WaitDebugger()`、`LyraGame.Inventory.AddItemInstance` Automation 测试、`LyraGameInstance::Shutdown()` 释放 PuerTS FJsEnv 的 GC 泄漏修复。
 >
 > 教训记录：复制 GameFeature 时不得保留与源插件同名的资产/类（UClass FName 冲突、PrimaryAssetId 重复），若需平行插件必须先做完整命名空间迁移。
 >
-> 不要 archive 本变更——归档会把 delta 规格写入主规格；本变更作为「方案不可行」的记录保留。
+> 不要 archive 本变更——归档会把 delta 规格写入主规格；本变更作为「方案调整」的记录保留，后续里程碑任务在此更新。
 
 ## Why
 
@@ -28,7 +28,7 @@
 
 - 实现 `FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)`（`LyraInventoryManagerComponent.cpp:110` 当前是 `unimplemented()`）；死亡掉落的尸包拾取依赖该路径。
 - 移除或配置化 `LyraGameInstance.cpp:93` 的 `GameScript->WaitDebugger()`，该调用在 Init 阶段阻塞等待调试器，Dedicated Server 无法启动。
-- 修正 `Config/DefaultPuerts.ini` 中指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把真正编译 `TypeScript/Main.ts` 的根 `tsconfig.json` 纳入 watch。
+- 修正 `Config/DefaultPuerts.ini` 中指向不存在的 `Developer/TypeScript/tsconfig.json` 的注册项，并把真正编译 `TypeScript/Main.ts` 的根 `tsconfig.json` 纳入 watch（**2026-08-12 已恢复**：移除 EasyEditorPlugin 迭代加入的 TypeScriptConfigPaths，回落原生 `tsconfig.json`）。
 - 同步 `TypeScript/Main.ts` 与 `Content/JavaScript/Main.js`（源码已注释掉 `GameplayRuntime` 实例化，编译产物仍在运行旧版本）。
 
 **玩法能力**
@@ -84,7 +84,7 @@
 
 **TypeScript / PuerTS**
 
-- `TypeScript/Main.ts`（保留用户现有修改，只增加最小 bootstrap）、新增 GameFeature 脚本模块目录、`Config/DefaultPuerts.ini`、根 `tsconfig.json` 与 `Developer/TypeScript/package.json`。
+- `TypeScript/Main.ts`（保留用户现有修改，只增加最小 bootstrap）、新增 GameFeature 脚本模块目录（`TypeScript/GameFeatures/`）、根 `tsconfig.json` 与项目根 `package.json`（原生 PuerTS 布局，EasyEditorPlugin 已移除）。
 - TS 承担范围：Phase 编排、局时与撤离流程、传送判定编排、装备操作意图提交、UI Presenter。
 - TS 不承担范围：`FFastArraySerializer` 复制结构、`UPROPERTY` 反射、AttributeSet、GameplayEffect Execution、子对象复制注册——这些必须是 C++。
 
