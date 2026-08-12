@@ -1,0 +1,21 @@
+# 项目级 Codex 文件扫描边界。仅在该项目被标记为受信任时生效。
+# 保留 Source/、Plugins/*/Source/、Config/、Scripts/、Tests/、TypeScript/、
+# Developer/TypeScript/、Content/Script/ 与 Content/JavaScript/ 的读取和编辑能力。
+
+default_permissions = "ue5-project"
+
+[permissions.ue5-project.filesystem]
+glob_scan_max_depth = 12
+
+[permissions.ue5-project.filesystem.":workspace_roots"]
+"." = "write"
+"Binaries/**" = "deny"
+"DerivedDataCache/**" = "deny"
+"Intermediate/**" = "deny"
+"Saved/**" = "deny"
+"Build/**" = "deny"
+"Content/**/*.uasset" = "deny"
+"Content/**/*.umap" = "deny"
+"Plugins/*/Binaries/**" = "deny"
+"Plugins/*/Intermediate/**" = "deny"
+"ThirdParty/**" = "deny"

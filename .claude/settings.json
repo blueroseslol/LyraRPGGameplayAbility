@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./Binaries/**)",
+      "Read(./DerivedDataCache/**)",
+      "Read(./Intermediate/**)",
+      "Read(./Saved/**)",
+      "Read(./Build/**)",
+      "Read(./Content/**/*.uasset)",
+      "Read(./Content/**/*.umap)",
+      "Read(./Plugins/*/Binaries/**)",
+      "Read(./Plugins/*/Intermediate/**)",
+      "Read(./ThirdParty/**)"
+    ]
+  }
+}
