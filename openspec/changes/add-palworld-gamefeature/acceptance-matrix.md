@@ -1,5 +1,7 @@
 # Palworld GameFeature 验收矩阵
 
+> **⚠️ 本变更已废弃（2026-08-12）**：见 proposal.md 顶部。Palworld 三插件已删除，本矩阵保留作为 M2「方案不可行」的执行记录；M1 基线修复已并入 ShooterGame，其验收在 `M1 基线修复` 行保留有效。
+
 > 所属变更：`openspec/changes/add-palworld-gamefeature`，对应 tasks.md 1.3。
 > 验收原则：**不以编译通过表述为 PIE / Cook / 联机验收通过**（`openspec/config.yaml` rules）。需要 Unreal Editor 的任务不得以编译通过替代验收。
 > 状态图例：✅ 通过 · ❌ 失败 · ⬜ 未验证 · — 不适用 · ⏸ 暂缓
@@ -23,7 +25,7 @@
 | 里程碑 | C++ 编译 | TS typecheck | Automation | Editor 资产 | Cook/Stage | Standalone | Dedicated Server | 双客户端 |
 |---|---|---|---|---|---|---|---|---|
 | M1 基线修复（2.1–2.7） | ✅ | — | ✅ | ⬜ | — | — | ⬜ | — |
-| M2 三插件复制（3.1–3.7） | ⬜ | — | — | ⬜ | — | ⬜ | — | — |
+| M2 三插件复制（3.1–3.7） | ✅ | — | — | ✅ | — | ⬜ | — | — |
 | M3 GameFeature TS 构建（4.1–4.6） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | — | — |
 | M4 区域传送（5.1–5.7） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | ⬜ | ⬜ |
 | M5 局内 Phase 与局时（6.1–6.12） | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -43,7 +45,7 @@
 
 ### M2 三插件复制
 
-- Editor 资产：插件可被识别；Tag 无重复定义/缺失；资产重定向后零跨插件引用。
+- Editor 资产：插件可被识别（8 个 GameFeature 全部 Registered）；Tag 无重复定义/缺失；Duplicate PrimaryAssetID 已修复（13 个主数据资产重命名 + PalworldMaps/Explorer 取消 `Map` 类型注册 + 删除损坏的 `PalworldMaps_Label` + 移除 `GameFeatureAction_DataRegistry`）；资产重定向**部分完成**——主内容简单软引用已修复，「零跨插件引用」未达成：残留为 Palworld 关卡（L_Expanse/L_Convolution_Blockout/L_Expanse_Blockout）的 WorldPartition 指向 ShooterGame 地图的外部文件 + 主内容子对象/硬类/元数据引用，已按用户决策（2026-08-12，现阶段不剥离 Shooter 引用）推迟到后续阶段手动修复，详见 tasks.md 3.5 ⑥ / 3.8。
 - Standalone：原 ShooterCore Elimination Experience 完成一局；Palworld 插件独立可启动。
 
 ### M3 GameFeature TS 构建

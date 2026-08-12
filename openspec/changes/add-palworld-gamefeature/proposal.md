@@ -1,3 +1,15 @@
+> **状态：已废弃（Abandoned）**
+>
+> 本变更于 2026-08-12 废弃：M2「复制 Shooter→Palworld 三插件」方案实施后，Palworld 复制资产与 Shooter 原版**同名**（Experience/Blueprint/地图等资产名与 PrimaryAssetId 相同），两个插件同时加载时生成类冲突、AssetManager Duplicate PrimaryAssetID，导致 ShooterGame 无法正常使用。经决策：**废弃 Palworld 三插件，直接在 ShooterGame 上开发**。
+>
+> 已执行的回滚：删除 `Plugins/GameFeatures/PalworldCore`（含 `PalworldCoreRuntime` C++ 模块）、`PalworldExplorer`、`PalworldMaps`；从 `LyraStarterGame.uproject` Plugins 移除三个条目；`LyraEditor` 重新编译通过。Shooter 三件套与 TopDownArena 保持原样（git 无改动）。
+>
+> 本变更中仍然有效、并已保留在 ShooterGame 上的改进：M1 基线缺陷修复——`FLyraInventoryList::AddEntry(ULyraInventoryItemInstance*)` 实现、`LyraGameInstance.cpp` 注释 `WaitDebugger()`、`LyraGame.Inventory.AddItemInstance` Automation 测试（这些修复对 ShooterGame 同样有益，未随废弃回退）。
+>
+> 教训记录：复制 GameFeature 时不得保留与源插件同名的资产/类（UClass FName 冲突、PrimaryAssetId 重复），若需平行插件必须先做完整命名空间迁移。
+>
+> 不要 archive 本变更——归档会把 delta 规格写入主规格；本变更作为「方案不可行」的记录保留。
+
 ## Why
 
 项目需要一个「搜打撤 + 分队对抗」原型（工作代号 Palworld）：玩家在单一持久世界内从各队基地出发、探索副本区域、拾取与装备物品、在全局局时结束时被强制撤离。Lyra 现有的 ShooterCore/ShooterExplorer/ShooterMaps 已经提供了武器、交互、Phase、队伍、出生点和 HUD 装配的完整骨架，复制这三个插件比从零搭建更快且可回退。
