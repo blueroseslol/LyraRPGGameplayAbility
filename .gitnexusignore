@@ -1,0 +1,39 @@
+# GitNexus 索引忽略（仅影响 GitNexus 分析，不影响 git 跟踪 / .gitignore）
+#
+# 参考 D:\MatrixTA\Lobby\.gitnexusignore 的 UE 产物目录约定：
+# UE 资产/构建产物（.uasset/.umap/中间文件）进入知识图谱只会产生噪声，
+# GitNexus 应只索引源代码（Source/、TypeScript/、插件 Source/ 等）。
+
+# UE 根级构建产物与生成内容 —— 整目录跳过
+Saved/
+Intermediate/
+Binaries/
+DerivedDataCache/
+Build/
+Content/
+.idea/
+.vs/
+Scripts/
+Setup.bat
+
+# PuerTS 生成的类型声明（.d.ts 自动生成物，量大且非手写源码）
+Typing/
+
+# UE 配置文件（.ini 纯文本，无代码图价值）
+Config/
+
+# 项目文档（无代码）
+Docs/
+
+# OpenSpec 规格/任务文档（无代码）
+openspec/
+
+# 各插件（含 Plugins/GameFeatures/* 子插件）的产物目录
+Plugins/**/Saved/
+Plugins/**/Intermediate/
+Plugins/**/Binaries/
+Plugins/**/Build/
+Plugins/**/Content/
+Plugins/**/Resources/
+Plugins/**/Shaders/
+Plugins/**/Docs/

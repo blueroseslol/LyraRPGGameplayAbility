@@ -1,0 +1,462 @@
+{
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/Main.ts": {
+        "version": "e90089ddb269e7c20c0448c7c9dc255a",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Bootstrap.ts": {
+        "version": "b11e9338b2616f652002fade21ac8cc2",
+        "processed": true
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Lifecycle.ts": {
+        "version": "e9312b0fa69465057db4d22c8b8bddbc",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/UeDeclarations.d.ts": {
+        "version": "c830e3e773df8662a30a1778cb6fdac7",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/DisposableScope.ts": {
+        "version": "5e089e41e5e5f0b74090717f336fa395",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/EventScope.ts": {
+        "version": "cf487391cebe5e71c5042203fe606d28",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/TimerScope.ts": {
+        "version": "32d8ba4cbfc8d8282acf635d6a7c884b",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/WeakRef.ts": {
+        "version": "8aec540ba3dc60bc4de21f6717649b8d",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/ShooterFeature.ts": {
+        "version": "b52b0e8be648d182f11e1dfa147bc5bf",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/ServiceRegistry.ts": {
+        "version": "722198559e48da1fe441a132a8dfca3d",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelCoordinator.ts": {
+        "version": "0ccf500c93812bb742aa2044b23a6e82",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelGateway.ts": {
+        "version": "5dbf82c826122e823bddb9fd5aacda85",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelTypes.ts": {
+        "version": "33c94dc3646e4626456973d8fb0e9567",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/ContractTests.ts": {
+        "version": "df2ce147a8de40b174d344477a6b2ee2",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/ShooterContractTests.ts": {
+        "version": "2718805c8ae217fe2827753a219dae48",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/TestKit.ts": {
+        "version": "28bfed2d47e3882f3c93cf642b32a84a",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/TravelCoordinatorTests.ts": {
+        "version": "b4fb2ee539719cc3611f233c9299cf04",
+        "processed": true,
+        "isBP": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ue/index.d.ts": {
+        "version": "a535f8c266d274cbd519ec126ac2a2a7",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ue/puerts.d.ts": {
+        "version": "325690ea61be7f69f6cd5bd0add51c23",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ue/ue.d.ts": {
+        "version": "dee801ba7c761365968036505e41a7aa",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/puerts/index.d.ts": {
+        "version": "c8471a147fadc739548c074909483529",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/cpp/index.d.ts": {
+        "version": "6a16ca6f31bc61d341b93be16f22acc2",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ue/puerts_decorators.d.ts": {
+        "version": "9fb1fa72f383c2560fd83bb22d51e984",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ue/ue_bp.d.ts": {
+        "version": "ba081696922a21a2ebde683585ee1071",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/Typing/ffi/index.d.ts": {
+        "version": "a371a5609d4ee418c7557ae5aa47afae",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.full.d.ts": {
+        "version": "f77b8dc33451a008b31acf5910ec7628",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.d.ts": {
+        "version": "0806a1e5f00b92006d1717776ae087e6",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.d.ts": {
+        "version": "ebb6a39ffa411027c89f8e847882cdf9",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2023.d.ts": {
+        "version": "68899e25d09c1695ebe3177328a693d2",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.d.ts": {
+        "version": "a0d58982e65e7bf50c55ae9e1acca8e4",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2021.d.ts": {
+        "version": "51da727159b146e0ec2a8ea3f1c55898",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.d.ts": {
+        "version": "0f4648ced400d083ffc0539db36e04f3",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.d.ts": {
+        "version": "5795f26508b5e51d094d308020b48e99",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.d.ts": {
+        "version": "6b4e60e058279581892af5ff259c6e87",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.d.ts": {
+        "version": "734e396ffbb424d7ad7bfe571951ce3d",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2016.d.ts": {
+        "version": "120e58ace62b1c78f00d8add8aa4711d",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.d.ts": {
+        "version": "d3a655f73fcec6e4cf0e6a744bad37a1",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es5.d.ts": {
+        "version": "4e602a10db77a14b9981ca8be8bc3b6f",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.decorators.d.ts": {
+        "version": "6654ef0ef6b23a68f9841e0448d70eea",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.decorators.legacy.d.ts": {
+        "version": "d20f09110d112c492f11f388e32dca90",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.core.d.ts": {
+        "version": "6e357f762804da201464693a0e20c040",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.collection.d.ts": {
+        "version": "c417014adc475ab5c2ab2222fe35e70a",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.iterable.d.ts": {
+        "version": "f6970ddab7ef69100a64a55d1e5c3516",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.symbol.d.ts": {
+        "version": "325c579bbb8bde481cde90a1b8ddf647",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.generator.d.ts": {
+        "version": "e892c45f7d83bc3f30d7ce7dc86ec173",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.promise.d.ts": {
+        "version": "d77a038846078b5aacb8c36fe19c9049",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.proxy.d.ts": {
+        "version": "0529fd532c6f6511e8da317f2ce3e892",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.reflect.d.ts": {
+        "version": "5c0c109f5e6edde0d3e4fd6bd99d28d4",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts": {
+        "version": "704286831fe5485b40ae198190b3ca21",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2016.array.include.d.ts": {
+        "version": "6074e602e4057c9c6215dee7c18bed5a",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2016.intl.d.ts": {
+        "version": "69a283c287f34e6b4285d0306dee12ae",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts": {
+        "version": "b057ece20e09c85a829febec1b7403c5",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.date.d.ts": {
+        "version": "c35210120fa93ada6b2cea3654f47067",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.intl.d.ts": {
+        "version": "760a5c66c5d809f7dcea0f448c1d1a64",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.object.d.ts": {
+        "version": "82758d316522fb2ed2ebe0ea19948488",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts": {
+        "version": "0105f9a05fb609fa21a5ba9d30324a21",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.string.d.ts": {
+        "version": "49c71536378fb7e900af8c55cd001b9e",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts": {
+        "version": "8b481c05cde7ab43e300a41782ad4883",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts": {
+        "version": "901aa3f4be33d643fb513d0900d61d75",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts": {
+        "version": "f4e4e7378bc8b9f271fbc2477608b22f",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.promise.d.ts": {
+        "version": "7ca34e4132ac3a1cd67ec03e27dec300",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.regexp.d.ts": {
+        "version": "34ddd0f1351148bdccfb08a252bb2eaa",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2018.intl.d.ts": {
+        "version": "2e1a65486c5f14b9fb381888f3a7fe52",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.array.d.ts": {
+        "version": "ed580bced1b58b7e7f04b6a7afc0c32d",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.object.d.ts": {
+        "version": "e61d6628beede43eb495f73d9df95c25",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.string.d.ts": {
+        "version": "a18c699082c12720259124cc85f39819",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.symbol.d.ts": {
+        "version": "4ba8a64f9046ede10f4c1b09b8c31f05",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2019.intl.d.ts": {
+        "version": "b54c63ca14aaedffd25622d5b3340269",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.bigint.d.ts": {
+        "version": "ebd7efff9ed15e805c449f7e61437241",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.intl.d.ts": {
+        "version": "6be3581d16fc1b10e027f9ad449df2c9",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.date.d.ts": {
+        "version": "7c7119df9fdd0cbf17555352b3aa8445",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.number.d.ts": {
+        "version": "2503a9b0275f4a35136a367c8550378d",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.promise.d.ts": {
+        "version": "6dddbc51900a91da20e0b591d18bc49b",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts": {
+        "version": "3981c13826d01ea226e3bb6e30a2f4d7",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.string.d.ts": {
+        "version": "36e98052a1f24a39b9842fbcacf4fbce",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts": {
+        "version": "bd05ed87202fc3b62206e4d1359a36c7",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2021.promise.d.ts": {
+        "version": "30f5cdce5cc7fd6a50fe2ef0966cd333",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2021.string.d.ts": {
+        "version": "63c4759296fa38cf8320e8d64d1786d5",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2021.weakref.d.ts": {
+        "version": "9ec29e1630958232f97fbe5dfd5d857c",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2021.intl.d.ts": {
+        "version": "68dca7ef83e17ef61c84c93618b582cb",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.array.d.ts": {
+        "version": "9368ed110a15c491c9c69466bcbd85cc",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.error.d.ts": {
+        "version": "3f8e5ceb8045d977023537ea2b218445",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.intl.d.ts": {
+        "version": "8ef2a3c3ac7c7822c880f782796a6457",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.object.d.ts": {
+        "version": "1c59e0c8f186b280173df59ca9874526",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.regexp.d.ts": {
+        "version": "9739161a9c0cdf78aec25f51fa476444",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2022.string.d.ts": {
+        "version": "80f6b0157d0f3ce4e24419d50fbd8603",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2023.array.d.ts": {
+        "version": "b73dcad9f0c2acbcc9f83d00727dfe33",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2023.collection.d.ts": {
+        "version": "4329127569c470836542d51032073e1e",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2023.intl.d.ts": {
+        "version": "02c58eac49395532b64d25759ac1ad5b",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.arraybuffer.d.ts": {
+        "version": "2c2ae8d94d2eac1e03f868c0006d359c",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.collection.d.ts": {
+        "version": "71d4d249d50cac37e2afd7c555f461f7",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.object.d.ts": {
+        "version": "c9f9f74c5e9cb187fc6483a73c0d6692",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.promise.d.ts": {
+        "version": "cab7d8eb607fc308e7fafa9175e4ebf5",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.regexp.d.ts": {
+        "version": "8010ab3e49b93fa8601ec718ca26ba46",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.sharedmemory.d.ts": {
+        "version": "97850a38beac2645bd202e10f944f1f5",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.es2024.string.d.ts": {
+        "version": "e040e2eaaa004d3a273c44c537893e6e",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.intl.d.ts": {
+        "version": "3d35543eb3f8773aea409e12dd8de573",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.decorators.d.ts": {
+        "version": "eadb639691de81bff7c9d9c83457681e",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.disposable.d.ts": {
+        "version": "3c8e266fd96bd0a0692c8979f72f252c",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.collection.d.ts": {
+        "version": "097d24afb6ec528446bce7a6f9041db2",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.array.d.ts": {
+        "version": "7905b5b4f4e198aed0e229b0ad0aff6a",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.iterator.d.ts": {
+        "version": "8e768d5674071e6714534211ffa62aa2",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.promise.d.ts": {
+        "version": "c90ade5cbcd2f8edf58f0aeb6d7f9cb2",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.float16.d.ts": {
+        "version": "e22f40e0a604bf7cad47678cccc1f6fa",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.error.d.ts": {
+        "version": "433d8ac2eb3de08b2e3add7883f0affa",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.esnext.sharedmemory.d.ts": {
+        "version": "eade0af6acfe1458710a805b19f0453c",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.dom.d.ts": {
+        "version": "15d456d118fd6270950a2bc9db1aac99",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.webworker.importscripts.d.ts": {
+        "version": "68c06bd3b8ae7d7f94f2ca26016d14b9",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.scripthost.d.ts": {
+        "version": "7b0d9dc5ea469daa4f54990015c8362e",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.dom.iterable.d.ts": {
+        "version": "a323bb3c3037e312c975142911ce4240",
+        "processed": false
+    },
+    "D:/MatrixTA/LyraRPGGameplayAbility/node_modules/typescript/lib/lib.dom.asynciterable.d.ts": {
+        "version": "1fa2cb652ddacf87933346f9c241fff2",
+        "processed": false
+    }
+}
