@@ -7,10 +7,10 @@
 
 ## 1. 里程碑 M0：基线与实施护栏
 
-- [ ] 1.1 在 `D:/MatrixTA/LyraRPGGameplayAbility` 记录主仓库及嵌套插件仓库（`Plugins/Puerts`、`Plugins/EasyEditorPlugin` 为符号链接，需单独确认）的 `git status --short`，建立 `TypeScript/Main.ts`、`openspec/config.yaml`、`Docs/` 等用户既有修改的不可覆盖清单；验证：再次运行 `git status --short` 比对，无需 Unreal Editor。
-- [ ] 1.2 将 `openspec/changes/add-arpg-moba-gamefeatures` 标记为被本变更取代（在其 `proposal.md` 顶部加入取代说明并注明本变更名），不执行 archive（其 delta 规格从未实施，归档会污染主规格）；验证：文件内容评审，无需 Unreal Editor。
-- [ ] 1.3 在 `Docs/04_Lyra/` 建立本变更的验收矩阵，列出 C++ 编译、TypeScript typecheck、Automation、Editor 资产、Cook/Stage、Standalone、Dedicated Server、双客户端八列，并为 Palworld 与原 Shooter 回归各留一行；验证：矩阵结构评审。
-- [ ] 1.4 在 `Docs/04_Lyra/` 记录实施边界矩阵：C++（必须）、TypeScript（编排与 UI）、Primary Data Asset、视觉资产、第三方模板各自的职责与不越界规则，依据 design.md 决策 8；验证：文档评审。
+- [x] 1.1 在 `D:/MatrixTA/LyraRPGGameplayAbility` 记录主仓库及嵌套插件仓库（`Plugins/Puerts`、`Plugins/EasyEditorPlugin` 为符号链接，需单独确认）的 `git status --short`，建立 `TypeScript/Main.ts`、`openspec/config.yaml`、`Docs/` 等用户既有修改的不可覆盖清单（记录于 `openspec/changes/add-palworld-gamefeature/baseline-record.md`）；验证：再次运行 `git status --short` 比对，无需 Unreal Editor。
+- [x] 1.2 将 `openspec/changes/add-arpg-moba-gamefeatures` 标记为被本变更取代（在其 `proposal.md` 顶部加入取代说明并注明本变更名），不执行 archive（其 delta 规格从未实施，归档会污染主规格）；验证：文件内容评审，无需 Unreal Editor。
+- [x] 1.3 在 `openspec/changes/add-palworld-gamefeature/` 建立本变更的验收矩阵（`acceptance-matrix.md`），列出 C++ 编译、TypeScript typecheck、Automation、Editor 资产、Cook/Stage、Standalone、Dedicated Server、双客户端八列，并为 Palworld 与原 Shooter 回归各留一行；验证：矩阵结构评审。
+- [x] 1.4 在 `openspec/changes/add-palworld-gamefeature/` 记录实施边界矩阵（`implementation-boundaries.md`）：C++（必须）、TypeScript（编排与 UI）、Primary Data Asset、视觉资产、第三方模板各自的职责与不越界规则，依据 design.md 决策 8；验证：文档评审。
 
 ## 2. 里程碑 M1：Lyra 基线缺陷修复（阻塞后续全部里程碑）
 
