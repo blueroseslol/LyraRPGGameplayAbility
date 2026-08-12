@@ -42,7 +42,7 @@ public class LyraGame : ModuleRules
 				"Niagara",
 				"AsyncMixin",
 				"ControlFlows",
-				"PropertyPath",	"JsEnv", "Puerts","PuertsRuntimePlugin"
+				"PropertyPath",	"JsEnv", "Puerts"
 			}
 		);
 

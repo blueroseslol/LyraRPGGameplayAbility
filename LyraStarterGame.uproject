@@ -342,10 +342,6 @@
 		{
 			"Name": "Reflex",
 			"Enabled": true
-		},
-		{
-			"Name": "EasyEditorPlugin",
-			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "451731683"
