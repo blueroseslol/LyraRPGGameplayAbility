@@ -1,32 +1,34 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+# 这是一个 Unreal Engine 5 游戏项目，核心玩法使用 C++，并通过 PuerTS 承载部分 TypeScript 逻辑。
+context: |
+  技术栈：Unreal Engine 5、C++、PuerTS、TypeScript。
+  项目文件：LyraStarterGame.uproject。
+  主要可编辑源码：Source/、Plugins/*/Source/、Config/、Scripts/、Tests/、TypeScript/、Developer/TypeScript/、Content/Script/、Content/JavaScript/。
+  UE 二进制资源（.uasset、.umap）及构建缓存不是评审或修改的默认目标；如需求明确涉及它们，先说明需要使用 Unreal Editor 或对应命令行工具验证。
+  遵循 Unreal 命名和模块边界：C++ 变更同时检查 Build.cs、Target.cs、模块依赖与反射宏；PuerTS 变更同时检查 tsconfig、类型声明和运行时入口。
+  不手工编辑 Binaries/、DerivedDataCache/、Intermediate/、Saved/ 或插件生成的 Binaries/Intermediate 内容。
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - 明确受影响的 UE 模块、Game Feature 或 PuerTS 脚本入口。
+    - 列出 C++、Blueprint/资产、配置和 TypeScript 的影响边界；未纳入范围的层必须写明。
+    - 若涉及网络玩法，说明 Authority、Owning Client、PlayerState/GameState 复制和 RPC 的职责。
+  design:
+    - C++ 设计必须列出模块依赖、UObject 生命周期、反射/序列化要求和 PuerTS 交互边界。
+    - 不把 PlayerIndex 当作网络玩家标识；多人与本地分屏逻辑分别设计。
+  tasks:
+    - 每项任务标注目标目录、验证命令以及是否需要 Unreal Editor、Cook、PIE 或联机验收。
+    - 将编译/TypeScript 类型检查与 Cook、打包、PIE、联机等运行时验收分开记录。
+  specs:
+    - 使用可验证的 SHALL 语句描述玩法行为、复制语义和失败处理。
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+operations:
+  apply:
+    guidance:
+      - 先检查工作区状态，只修改变更任务明确覆盖的文件。
+      - 优先运行受影响模块的编译和 TypeScript 类型检查；不要把通过编译表述为 PIE、Cook 或联机验收通过。
+      - 仅在需求明确时修改 .uasset 或 .umap，并记录所需的 Unreal Editor 验证步骤。
+  archive:
+    guidance:
+      - 汇总静态检查、编译、类型检查、Cook、PIE 和联机验收的实际结果；未运行项必须明确标为未验证。
