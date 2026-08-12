@@ -11,28 +11,28 @@
 /** 对世界对象的弱（或不保留的）引用。 */
 export interface WorldRef<TWorld extends object> {
   /** 返回被引用的世界对象；若已被垃圾回收则返回 null。 */
-  get(): TWorld | null;
+  Get(): TWorld | null;
 }
 
-const supportsWeakRef =
+const SupportsWeakRef =
   typeof WeakRef !== "undefined" && typeof FinalizationRegistry !== "undefined";
 
 /**
  * 构建一个 WorldRef。优先使用真正的 `WeakRef`；在不支持 WeakRef 的运行时，
- * 返回一个不保留世界的引用（安全 —— 调用方必须把 `get()` 返回 null 视为
+ * 返回一个不保留世界的引用（安全 —— 调用方必须把 `Get()` 返回 null 视为
  * 「世界已消失」）。
  */
-export function createWorldRef<TWorld extends object>(world: TWorld): WorldRef<TWorld> {
-  if (supportsWeakRef) {
-    const ref = new WeakRef<TWorld>(world);
+export function CreateWorldRef<TWorld extends object>(World: TWorld): WorldRef<TWorld> {
+  if (SupportsWeakRef) {
+    const Ref = new WeakRef<TWorld>(World);
     return {
-      get(): TWorld | null {
-        return ref.deref() ?? null;
+      Get(): TWorld | null {
+        return Ref.deref() ?? null;
       },
     };
   }
   return {
-    get(): TWorld | null {
+    Get(): TWorld | null {
       return null;
     },
   };
