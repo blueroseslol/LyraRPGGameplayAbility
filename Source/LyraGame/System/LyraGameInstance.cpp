@@ -125,6 +125,10 @@ void ULyraGameInstance::Init()
 
 void ULyraGameInstance::Shutdown()
 {
+	// 释放 PuerTS JS 环境：Init 时把 `this` 传入 JS，UserObjectRetainer 会持有本 GameInstance；
+	// 若不在 Shutdown 时销毁 FJsEnv，PIE 结束后旧 GameInstance 被 JS 引用无法 GC（报 "still referenced" 泄漏）。
+	GameScript.Reset();
+
 	if (UCommonSessionSubsystem* SessionSubsystem = GetSubsystem<UCommonSessionSubsystem>())
 	{
 		SessionSubsystem->OnPreClientTravelEvent.RemoveAll(this);
