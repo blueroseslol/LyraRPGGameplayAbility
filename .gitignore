@@ -11,3 +11,4 @@ Content/JavaScript/PuertsEditor/node_modules
 Content/JavaScript/PuertsEditor/package-lock.json
 .idea
 .vs
+node_modules
