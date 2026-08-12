@@ -1,21 +1,20 @@
 /**
- * EventScope — tracks event subscriptions made during a single activation so
- * they can all be unsubscribed on deactivate.
+ * EventScope —— 跟踪单次激活期间的事件订阅，以便在停用时统一取消订阅。
  *
- * Subscription is delegated to an injected `EventSubscriber` adapter over the
- * UE delegate system, keeping this module pure and testable under plain Node.
+ * 订阅逻辑委托给注入的 `EventSubscriber` 适配器（对 UE 委托系统的封装），
+ * 使本模块保持纯净、可在纯 Node 下测试。
  */
 
-/** Handle to a live event subscription. unsubscribe() tears it down. */
+/** 指向一个活跃事件订阅的句柄。unsubscribe() 拆除它。 */
 export interface EventSubscription {
   readonly id: number;
   unsubscribe(): void;
 }
 
-/** Channel identifier — a string (FName) on the UE side, but kept abstract. */
+/** 频道标识 —— UE 侧为字符串（FName），这里保持抽象。 */
 export type EventChannel = string | number | symbol;
 
-/** Adapter over the host event system (UE multicast delegates / signals). */
+/** 对宿主事件系统（UE 多播委托 / 信号）的适配器。 */
 export interface EventSubscriber<TChannel extends EventChannel = EventChannel> {
   subscribe(channel: TChannel, handler: (payload: unknown) => void): EventSubscription;
 }
@@ -31,15 +30,14 @@ export class EventScope<TChannel extends EventChannel = EventChannel> {
     this.subscriber = subscriber;
   }
 
-  /** Number of live (not-yet-unsubscribed) subscriptions tracked here. */
+  /** 此处跟踪的活跃（尚未取消订阅）订阅数量。 */
   get size(): number {
     return this.subscriptions.size;
   }
 
   /**
-   * Subscribe to an event and track it. It is torn down automatically by
-   * clear() (i.e. on deactivate). Returns a no-op subscription if the
-   * subscriber throws.
+   * 订阅一个事件并跟踪它。它会由 clear()（即停用时）自动拆除。
+   * 若订阅器抛异常则返回一个 no-op 订阅。
    */
   on(channel: TChannel, handler: (payload: unknown) => void): EventSubscription {
     let underlying: EventSubscription;
@@ -59,7 +57,7 @@ export class EventScope<TChannel extends EventChannel = EventChannel> {
     };
   }
 
-  /** Unsubscribe one tracked subscription by id. No-op if unknown/removed. */
+  /** 按 id 取消一个已跟踪的订阅。未知/已移除时为 no-op。 */
   unsubscribe(id: number): void {
     const sub = this.subscriptions.get(id);
     if (!sub) {
@@ -73,7 +71,7 @@ export class EventScope<TChannel extends EventChannel = EventChannel> {
     }
   }
 
-  /** Unsubscribe everything tracked by this scope. Idempotent. */
+  /** 取消本作用域跟踪的所有订阅。幂等。 */
   clear(): void {
     for (const sub of this.subscriptions.values()) {
       try {

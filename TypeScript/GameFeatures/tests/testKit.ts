@@ -1,10 +1,9 @@
 /**
- * Minimal zero-dependency test harness for contract tests.
+ * 极简零依赖测试框架，用于 contract tests。
  *
- * Deliberately avoids @types/node (not installed in this project) so it runs
- * under plain Node on the compiled output:
+ * 刻意不依赖 @types/node（本项目未安装），因此可对编译产物在纯 Node 下运行：
  *
- *   node --expose-gc Content/JavaScript/GameFeatures/contractTests.js
+ *   node --expose-gc Content/JavaScript/GameFeatures/tests/contractTests.js
  */
 
 export interface TestResult {

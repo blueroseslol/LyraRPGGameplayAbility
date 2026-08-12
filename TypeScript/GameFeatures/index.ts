@@ -1,8 +1,8 @@
 /**
- * GameFeature script lifecycle — public entry.
+ * GameFeature 脚本生命周期 —— 公共入口。
  *
- * Compiles to Content/JavaScript/GameFeatures/index.js. The 4.5 bootstrap
- * (TypeScript/Main.ts) imports the lifecycle classes from here.
+ * 编译产物为 Content/JavaScript/GameFeatures/index.js。4.5 的 bootstrap
+ * （TypeScript/Main.ts）从这里导入生命周期类。
  */
 export { GameFeatureLifecycle, RebuildGuard } from "./lifecycle";
 export type {

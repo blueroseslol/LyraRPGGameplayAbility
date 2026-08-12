@@ -1,19 +1,16 @@
 /**
- * GameFeature script lifecycle — pure, UE-free core.
+ * GameFeature 脚本生命周期 —— 纯净、不依赖 UE 的核心。
  *
- * All UE-touching dependencies (world, timers, events) arrive as an injected
- * `LifecycleAdapters` bundle at activation time. The state machine here only
- * reasons about registered modules and activation state, so it can be tested
- * under plain Node without an Unreal runtime.
+ * 所有接触 UE 的依赖（world、定时器、事件）都以注入的 `LifecycleAdapters`
+ * 形式在激活时传入。此处的状态机只关心已注册模块与激活状态，因此可以在
+ * 没有 Unreal 运行时的情况下于纯 Node 中测试。
  *
- * Guarantees:
- *  - register/unregister are name-idempotent.
- *  - activate()/deactivate() are idempotent.
- *  - modules registered while the feature is already active get their
- *    activation state replayed immediately.
- *  - deactivate() symmetrically releases everything created by activate():
- *    the module's own deactivate(), then timer cancellation, then LIFO
- *    disposable release, then event teardown.
+ * 保证：
+ *  - register/unregister 按模块名幂等。
+ *  - activate()/deactivate() 幂等。
+ *  - 功能已激活后才注册的模块会立即重放其激活状态。
+ *  - deactivate() 对称释放 activate() 创建的一切：先执行模块自身的
+ *    deactivate()，再取消定时器，然后按 LIFO 释放 disposable，最后拆除事件。
  */
 import { DisposableScope } from "./scopes/disposableScope";
 import { TimerScope } from "./scopes/timerScope";
@@ -23,31 +20,31 @@ import type { EventChannel, EventSubscription } from "./scopes/eventScope";
 import { createWorldRef } from "./scopes/weakRef";
 import type { WorldRef } from "./scopes/weakRef";
 
-/** Adapter bundle injected at activation time (created by the UE-side bootstrap). */
+/** 激活时注入的适配器集合（由 UE 侧 bootstrap 创建）。 */
 export interface LifecycleAdapters<TWorld extends object = object, TChannel extends EventChannel = string> {
-  /** The world this activation is scoped to. Only ever handed to modules weakly. */
+  /** 本次激活作用域对应的世界。只以弱引用形式交给模块。 */
   world: TWorld;
-  /** Create a real timer; the returned handle can cancel it. */
+  /** 创建真实定时器；返回的句柄可取消它。 */
   createTimer(delaySeconds: number, callback: () => void, repeating?: boolean): TimerHandle;
-  /** Subscribe to a real event channel; the returned handle unsubscribes. */
+  /** 订阅真实事件频道；返回的句柄可取消订阅。 */
   subscribeEvent(channel: TChannel, handler: (payload: unknown) => void): EventSubscription;
-  /** Optional override for building the weak world reference. */
+  /** 可选的弱世界引用构建覆盖。 */
   createWorldRef?(world: TWorld): WorldRef<TWorld>;
 }
 
-/** Per-module activation context — the only things a module may hold onto. */
+/** 每模块的激活上下文 —— 模块唯一可以持有的东西。 */
 export interface ActivationContext<TWorld extends object = object, TChannel extends EventChannel = string> {
-  /** Weak reference to the world (never the world itself — avoids leaks). */
+  /** 对世界的弱引用（绝不是世界本身 —— 避免泄漏）。 */
   readonly world: WorldRef<TWorld>;
-  /** Timers created here are cancelled automatically on deactivate. */
+  /** 在此创建的定时器会在停用时自动取消。 */
   readonly timers: TimerScope;
-  /** Cleanup callbacks run LIFO on deactivate. */
+  /** 在此注册的清理回调在停用时按 LIFO 运行。 */
   readonly disposables: DisposableScope;
-  /** Event subscriptions made here are torn down automatically on deactivate. */
+  /** 在此建立的事件订阅会在停用时自动拆除。 */
   readonly events: EventScope<TChannel>;
 }
 
-/** A GameFeature module: a named unit of feature behavior. */
+/** 一个 GameFeature 模块：一个命名的功能行为单元。 */
 export interface GameFeatureModule<TWorld extends object = object, TChannel extends EventChannel = string> {
   readonly name: string;
   activate(context: ActivationContext<TWorld, TChannel>): void;
@@ -55,7 +52,7 @@ export interface GameFeatureModule<TWorld extends object = object, TChannel exte
 }
 
 export interface GameFeatureLifecycleOptions {
-  /** Opaque generation/boot id, used with RebuildGuard for "rebuild once". */
+  /** 不透明的代数/启动 id，与 RebuildGuard 配合实现「只重建一次」。 */
   generation?: number;
 }
 
@@ -65,7 +62,7 @@ interface ActiveModule<TWorld extends object, TChannel extends EventChannel> {
 }
 
 /**
- * Pure lifecycle state machine for a single GameFeature.
+ * 单个 GameFeature 的纯生命周期状态机。
  */
 export class GameFeatureLifecycle<TWorld extends object = object, TChannel extends EventChannel = string> {
   private readonly modules = new Map<string, GameFeatureModule<TWorld, TChannel>>();
@@ -73,32 +70,31 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
   private adapters: LifecycleAdapters<TWorld, TChannel> | null = null;
   private activeFlag = false;
 
-  /** Opaque generation/boot id (see RebuildGuard). */
+  /** 不透明的代数/启动 id（见 RebuildGuard）。 */
   readonly generation: number;
 
   constructor(options: GameFeatureLifecycleOptions = {}) {
     this.generation = options.generation ?? 0;
   }
 
-  /** Whether the feature is currently activated. */
+  /** 功能当前是否已激活。 */
   get isActive(): boolean {
     return this.activeFlag;
   }
 
-  /** Number of registered (non-unregistered) modules. */
+  /** 已注册（未注销）的模块数量。 */
   get moduleCount(): number {
     return this.modules.size;
   }
 
-  /** Number of modules currently in the activated state. */
+  /** 当前处于激活状态的模块数量。 */
   get activeModuleCount(): number {
     return this.active.size;
   }
 
   /**
-   * Register a module. Idempotent per module name — registering the same name
-   * twice is a no-op and never double-activates. If the feature is already
-   * active, the module's activation state is replayed immediately.
+   * 注册一个模块。按模块名幂等 —— 重复注册同名模块为 no-op，绝不会
+   * 双重激活。若功能已激活，则该模块的激活状态会立即重放。
    */
   register(module: GameFeatureModule<TWorld, TChannel>): void {
     if (this.modules.has(module.name)) {
@@ -111,8 +107,7 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
   }
 
   /**
-   * Unregister a module by reference or name. If it is currently activated it
-   * is deactivated (symmetrically released) first.
+   * 按引用或名字注销一个模块。若它当前已激活，会先（对称）释放。
    */
   unregister(moduleOrName: GameFeatureModule<TWorld, TChannel> | string): void {
     const name = typeof moduleOrName === "string" ? moduleOrName : moduleOrName.name;
@@ -123,9 +118,8 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
   }
 
   /**
-   * Activate the feature with the given adapters. Idempotent — calling again
-   * while already active is a no-op. Activate is called on every registered
-   * module in registration order.
+   * 用给定适配器激活功能。幂等 —— 已激活时再次调用为 no-op。
+   * 会对每个已注册模块按注册顺序调用 activate。
    */
   activate(adapters: LifecycleAdapters<TWorld, TChannel>): void {
     if (this.activeFlag) {
@@ -139,11 +133,10 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
   }
 
   /**
-   * Deactivate the feature. Idempotent — calling again while not active is a
-   * no-op. Modules are deactivated in reverse activation order (symmetric:
-   * FIFO activate / LIFO deactivate). Each module's deactivate() runs first,
-   * then its timers are cancelled, disposables are released (LIFO) and event
-   * subscriptions are torn down.
+   * 停用功能。幂等 —— 未激活时再次调用为 no-op。
+   * 模块按激活顺序的逆序停用（对称：FIFO 激活 / LIFO 停用）。
+   * 每个模块先运行自己的 deactivate()，然后取消定时器、按 LIFO 释放
+   * disposable，最后拆除事件订阅。
    */
   deactivate(): void {
     if (!this.activeFlag) {
@@ -151,7 +144,7 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
     }
     this.activeFlag = false;
     this.adapters = null;
-    // Reverse activation order => symmetric (FIFO activate / LIFO deactivate).
+    // 逆激活顺序 => 对称（FIFO 激活 / LIFO 停用）。
     const names = [...this.active.keys()];
     for (let i = names.length - 1; i >= 0; i--) {
       this.deactivateModule(names[i]);
@@ -186,7 +179,7 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
     } catch (error) {
       console.error(`[GameFeatureLifecycle] deactivate('${module.name}') threw:`, error);
     }
-    // Symmetric release of everything created during activate().
+    // 对称释放 activate() 期间创建的一切。
     context.timers.cancelAll();
     context.disposables.dispose();
     context.events.clear();
@@ -210,28 +203,27 @@ export class GameFeatureLifecycle<TWorld extends object = object, TChannel exten
 }
 
 /**
- * Rebuild guard — "rebuild exactly once per VM generation".
+ * 重建保护 ——「每个 VM 代数只重建一次」。
  *
- * A PuerTS FJsEnv restart destroys all JS state, so the GameFeature must be
- * reconstructed by the new VM's bootstrap. If that bootstrap code runs more
- * than once (defensive re-entry, duplicate registration), this guard ensures
- * only the first build request of a generation is honored.
+ * PuerTS 的 FJsEnv 重启会销毁所有 JS 状态，因此 GameFeature 必须由新 VM 的
+ * bootstrap 重建。若该 bootstrap 代码被执行超过一次（防御性重入、重复注册），
+ * 本保护确保同一代数内只认可第一次构建请求。
  *
- * Pure logic — testable without UE.
+ * 纯逻辑 —— 无 UE 依赖，可测试。
  */
 export class RebuildGuard {
   private generation = 0;
   private builtGeneration: number | null = null;
 
-  /** Current VM generation id. */
+  /** 当前 VM 代数 id。 */
   get currentGeneration(): number {
     return this.generation;
   }
 
   /**
-   * Called by the bootstrap when a (new) VM starts. Returns the new
-   * generation id. In a real integration the id can be sourced from a
-   * UE-side counter that survives VM restarts; here it is simply bumped.
+   * 由 bootstrap 在（新）VM 启动时调用。返回新的代数 id。
+   * 真实集成中该 id 可取自 UE 侧在 VM 重启后仍然存活的计数器；
+   * 这里简单递增。
    */
   markVmStart(): number {
     this.generation++;
@@ -239,8 +231,8 @@ export class RebuildGuard {
   }
 
   /**
-   * Claim the right to build for the current generation. Returns true only
-   * once per generation; subsequent calls in the same generation return false.
+   * 申领当前代数的构建权。每个代数只返回一次 true；
+   * 同一代数内的后续调用返回 false。
    */
   beginBuild(): boolean {
     if (this.builtGeneration === this.generation) {
@@ -250,7 +242,7 @@ export class RebuildGuard {
     return true;
   }
 
-  /** Reset to a fresh state (mainly for tests). */
+  /** 重置到全新状态（主要用于测试）。 */
   reset(): void {
     this.generation = 0;
     this.builtGeneration = null;

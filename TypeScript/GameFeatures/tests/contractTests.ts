@@ -1,12 +1,12 @@
 /**
- * Contract tests for the GameFeature script lifecycle (M3, 4.4).
+ * GameFeature 脚本生命周期（M3, 4.4）的 contract tests。
  *
- * Pure logic — runs under plain Node against the compiled output:
+ * 纯逻辑 —— 对编译产物在纯 Node 下运行：
  *
  *   node --expose-gc Content/JavaScript/GameFeatures/tests/contractTests.js
  *
- * (--expose-gc enables the best-effort WeakRef GC assertion; without it the
- * test still runs and just asserts the API shape.)
+ * （--expose-gc 启用尽力而为的 WeakRef GC 断言；不带它测试仍会运行，
+ * 只是改为断言 API 形态。）
  */
 import {
   GameFeatureLifecycle,
@@ -27,7 +27,7 @@ import type {
 import { test, assert, assertEqual, runTests } from "./testKit";
 
 // ---------------------------------------------------------------------------
-// Helpers
+// 辅助
 // ---------------------------------------------------------------------------
 
 function makeModule(
@@ -61,7 +61,7 @@ interface MockAdapters extends LifecycleAdapters<{ id: number }, string> {
   events: EventMock[];
 }
 
-/** Build a mock adapter bundle that records timer/event lifecycle. */
+/** 构建一个记录定时器/事件生命周期的 mock 适配器集合。 */
 function makeMockAdapters(): {
   adapters: MockAdapters;
   timers: TimerMock[];
@@ -115,7 +115,7 @@ function makeMockAdapters(): {
 }
 
 // ---------------------------------------------------------------------------
-// 1. Idempotent activation
+// 1. 幂等激活
 // ---------------------------------------------------------------------------
 
 test("repeated activate is a no-op — side effects happen once", () => {
@@ -126,7 +126,7 @@ test("repeated activate is a no-op — side effects happen once", () => {
   const { adapters } = makeMockAdapters();
 
   lifecycle.activate(adapters);
-  lifecycle.activate(adapters); // second — must be a no-op
+  lifecycle.activate(adapters); // 第二次 —— 必须是 no-op
 
   assertEqual(activateCalls, 1);
   assertEqual(deactivateCalls, 0);
@@ -138,7 +138,7 @@ test("repeated activate is a no-op — side effects happen once", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 2. Idempotent deactivation
+// 2. 幂等停用
 // ---------------------------------------------------------------------------
 
 test("repeated deactivate is a no-op", () => {
@@ -150,7 +150,7 @@ test("repeated deactivate is a no-op", () => {
 
   lifecycle.activate(adapters);
   lifecycle.deactivate();
-  lifecycle.deactivate(); // second — must be a no-op
+  lifecycle.deactivate(); // 第二次 —— 必须是 no-op
 
   assertEqual(activateCalls, 1);
   assertEqual(deactivateCalls, 1);
@@ -159,7 +159,7 @@ test("repeated deactivate is a no-op", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. Activation replay for modules registered after activation
+// 3. 对激活后注册的模块重放激活
 // ---------------------------------------------------------------------------
 
 test("modules registered after activation get activation replayed", () => {
@@ -180,7 +180,7 @@ test("modules registered after activation get activation replayed", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 4. Duplicate registration is idempotent
+// 4. 重复注册幂等
 // ---------------------------------------------------------------------------
 
 test("registering the same module twice is idempotent", () => {
@@ -188,7 +188,7 @@ test("registering the same module twice is idempotent", () => {
   const module = makeModule("m1", () => activateCalls++);
   const lifecycle = new GameFeatureLifecycle();
   lifecycle.register(module);
-  lifecycle.register(module); // duplicate — must not double register
+  lifecycle.register(module); // 重复 —— 不得重复注册
 
   assertEqual(lifecycle.moduleCount, 1);
   const { adapters } = makeMockAdapters();
@@ -198,7 +198,7 @@ test("registering the same module twice is idempotent", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 5. DisposableScope: LIFO release on deactivate
+// 5. DisposableScope：停用时按 LIFO 释放
 // ---------------------------------------------------------------------------
 
 test("DisposableScope releases LIFO on deactivate", () => {
@@ -216,7 +216,7 @@ test("DisposableScope releases LIFO on deactivate", () => {
   const { adapters } = makeMockAdapters();
 
   lifecycle.activate(adapters);
-  assertEqual(order.length, 0); // nothing released while active
+  assertEqual(order.length, 0); // 激活期间不释放任何东西
   lifecycle.deactivate();
   assertEqual(order.join(","), "d3,d2,d1"); // LIFO
 });
@@ -227,15 +227,15 @@ test("DisposableScope is idempotent and safe after dispose", () => {
   scope.add(() => released.push("a"));
   scope.add(() => released.push("b"));
   scope.dispose();
-  scope.dispose(); // second — no-op
+  scope.dispose(); // 第二次 —— no-op
   assertEqual(released.join(","), "b,a");
-  // Adding after dispose runs the callback immediately.
+  // dispose 后再 add 会立即执行回调。
   scope.add(() => released.push("c"));
   assertEqual(released.join(","), "b,a,c");
 });
 
 // ---------------------------------------------------------------------------
-// 6. Timer cleanup on deactivate
+// 6. 停用时的定时器清理
 // ---------------------------------------------------------------------------
 
 test("timers created during activate are all cancelled on deactivate", () => {
@@ -275,7 +275,7 @@ test("a manually cancelled timer is released from the scope", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. Event teardown on deactivate
+// 7. 停用时的拆除事件
 // ---------------------------------------------------------------------------
 
 test("event subscriptions made during activate are torn down on deactivate", () => {
@@ -299,7 +299,7 @@ test("event subscriptions made during activate are torn down on deactivate", () 
 });
 
 // ---------------------------------------------------------------------------
-// 8. Symmetric release order: module.deactivate() before resource release
+// 8. 对称释放顺序：先模块 deactivate() 再释放资源
 // ---------------------------------------------------------------------------
 
 test("deactivate runs module.deactivate() then releases resources", () => {
@@ -327,7 +327,7 @@ test("deactivate runs module.deactivate() then releases resources", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. Weak world reference
+// 9. 弱世界引用
 // ---------------------------------------------------------------------------
 
 test("modules receive a weak world reference, not the world itself", () => {
@@ -349,22 +349,21 @@ test("modules receive a weak world reference, not the world itself", () => {
 
 test("createWorldRef does not retain the world strongly (best-effort GC)", async () => {
   function buildTransientRef(): WorldRef<{ id: number }> {
-    // The world goes out of scope when this function returns; only the WeakRef
-    // escapes, so there is no strong reference left to keep it alive.
+    // 该函数返回时世界对象离开作用域；只有 WeakRef 逃逸出去，
+    // 因此没有任何强引用能把它留活。
     const world = { id: 42 };
     return createWorldRef(world);
   }
 
   const gc = (globalThis as { gc?: () => void }).gc;
   if (typeof gc !== "function") {
-    // Cannot force GC in this runtime; just assert the API shape.
+    // 该运行时无法强制 GC；仅断言 API 形态。
     assert(typeof createWorldRef({ id: 1 }).get === "function");
     return;
   }
 
   const ref = buildTransientRef();
-  // V8 keeps WeakRef targets alive until the end of the current job, so yield
-  // to the event loop before forcing GC.
+  // V8 会保留 WeakRef 目标到当前 job 结束，因此先让出事件循环再强制 GC。
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
   gc();
   gc();
@@ -372,7 +371,7 @@ test("createWorldRef does not retain the world strongly (best-effort GC)", async
 });
 
 // ---------------------------------------------------------------------------
-// 10. VM restart rebuilds exactly once
+// 10. VM 重启后恰好重建一次
 // ---------------------------------------------------------------------------
 
 test("VM restart rebuilds the feature exactly once (no duplicate registration)", () => {
@@ -380,42 +379,42 @@ test("VM restart rebuilds the feature exactly once (no duplicate registration)",
   let activateCalls = 0;
   const module = makeModule("m1", () => activateCalls++);
 
-  // Boot #1 (generation 0).
+  // 启动 #1（代数 0）。
   assertEqual(guard.beginBuild(), true);
   const lc1 = new GameFeatureLifecycle({ generation: guard.currentGeneration });
   lc1.register(module);
-  lc1.register(module); // defensive duplicate — must not double-register
+  lc1.register(module); // 防御性重复 —— 不得重复注册
   const mock1 = makeMockAdapters();
   lc1.activate(mock1.adapters);
   assertEqual(activateCalls, 1);
   assertEqual(lc1.activeModuleCount, 1);
 
-  // Re-entry of the same bootstrap in the same VM — ignored.
+  // 同一 VM 内 bootstrap 的重入 —— 忽略。
   assertEqual(guard.beginBuild(), false);
 
-  // Clean shutdown of the old VM.
+  // 旧 VM 的干净关闭。
   lc1.deactivate();
   assertEqual(lc1.activeModuleCount, 0);
 
-  // VM restart → new generation.
+  // VM 重启 → 新代数。
   guard.markVmStart();
   assertEqual(guard.currentGeneration, 1);
-  assertEqual(guard.beginBuild(), true); // allowed once for the new VM
+  assertEqual(guard.beginBuild(), true); // 新 VM 只允许一次
   const lc2 = new GameFeatureLifecycle({ generation: guard.currentGeneration });
-  lc2.register(module); // re-register the same module after restart
+  lc2.register(module); // 重启后重新注册同一模块
   const mock2 = makeMockAdapters();
   lc2.activate(mock2.adapters);
-  assertEqual(activateCalls, 2); // exactly one more activation
+  assertEqual(activateCalls, 2); // 恰好多一次激活
   assertEqual(lc2.activeModuleCount, 1);
 
-  // Re-entry in the new VM — ignored; no extra activation.
+  // 新 VM 内重入 —— 忽略；无额外激活。
   assertEqual(guard.beginBuild(), false);
   assertEqual(lc2.activeModuleCount, 1);
   assertEqual(activateCalls, 2);
 });
 
 // ---------------------------------------------------------------------------
-// 11. Unregister while active symmetrically releases
+// 11. 激活中注销会对称释放
 // ---------------------------------------------------------------------------
 
 test("unregister while active symmetrically releases the module", () => {
@@ -433,7 +432,7 @@ test("unregister while active symmetrically releases the module", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 12. Scopes are usable standalone (unit sanity)
+// 12. 作用域可独立使用（单元健全性）
 // ---------------------------------------------------------------------------
 
 test("TimerScope/EventScope track and release standalone", () => {
@@ -455,10 +454,10 @@ test("TimerScope/EventScope track and release standalone", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Runner
+// 运行器
 // ---------------------------------------------------------------------------
 
-// Minimal ambient so this file can set a non-zero exit code without @types/node.
+// 极简 ambient 声明：让本文件无需 @types/node 也能设置非零退出码。
 declare const process: { exitCode: number };
 
 async function main(): Promise<void> {

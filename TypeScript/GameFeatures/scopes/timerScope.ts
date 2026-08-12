@@ -1,19 +1,17 @@
 /**
- * TimerScope — tracks timers created during a single activation so they can
- * all be cancelled on deactivate.
+ * TimerScope —— 跟踪单次激活期间创建的定时器，以便在停用时统一取消。
  *
- * Actual timer creation is delegated to an injected `TimerFactory` (a thin
- * adapter over the UE timer system), keeping this module pure and testable
- * under plain Node.
+ * 实际创建定时器的逻辑委托给注入的 `TimerFactory`（对 UE 定时器系统的
+ * 薄封装），使本模块保持纯净、可在纯 Node 下测试。
  */
 
-/** Handle to a live timer. Calling cancel() stops it. */
+/** 指向一个活跃定时器的句柄。调用 cancel() 停止它。 */
 export interface TimerHandle {
   readonly id: number;
   cancel(): void;
 }
 
-/** Adapter over the host timer system (UE KismetSystemLibrary / Latent etc.). */
+/** 对宿主导航定时器系统（UE KismetSystemLibrary / Latent 等）的适配器。 */
 export interface TimerFactory {
   createTimer(delaySeconds: number, callback: () => void, repeating?: boolean): TimerHandle;
 }
@@ -29,15 +27,14 @@ export class TimerScope {
     this.factory = factory;
   }
 
-  /** Number of live (not-yet-cancelled) timers tracked by this scope. */
+  /** 本作用域跟踪的活跃（尚未取消）定时器数量。 */
   get size(): number {
     return this.handles.size;
   }
 
   /**
-   * Create a timer through the injected factory and track it. It is cancelled
-   * automatically by cancelAll() (i.e. on deactivate). Returns a no-op handle
-   * if the factory throws.
+   * 通过注入的工厂创建定时器并跟踪它。它会由 cancelAll()（即停用时）
+   * 自动取消。若工厂抛异常则返回一个 no-op 句柄。
    */
   set(delaySeconds: number, callback: () => void, repeating = false): TimerHandle {
     const id = this.nextId++;
@@ -57,7 +54,7 @@ export class TimerScope {
     };
   }
 
-  /** Cancel one tracked timer by id. No-op if unknown/already cancelled. */
+  /** 按 id 取消一个已跟踪的定时器。未知/已取消时为 no-op。 */
   cancel(id: number): void {
     const handle = this.handles.get(id);
     if (!handle) {
@@ -71,7 +68,7 @@ export class TimerScope {
     }
   }
 
-  /** Cancel every timer created through this scope. Idempotent. */
+  /** 取消本作用域创建的所有定时器。幂等。 */
   cancelAll(): void {
     for (const handle of this.handles.values()) {
       try {

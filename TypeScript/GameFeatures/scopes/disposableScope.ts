@@ -1,36 +1,34 @@
 /**
- * DisposableScope — a LIFO "release delegate" scope.
+ * DisposableScope —— LIFO「释放委托」作用域。
  *
- * Cleanup callbacks registered inside `activate()` are stored and run in
- * reverse order (LIFO) when the feature deactivates, giving symmetric release
- * of everything created during activation.
+ * `activate()` 内注册的清理回调会按逆序（LIFO）在功能停用时执行，
+ * 从而对激活期间创建的一切资源做对称释放。
  *
- * Pure logic — no UE dependency. Safe to unit test under plain Node.
+ * 纯逻辑 —— 无 UE 依赖，可在纯 Node 下单元测试。
  */
 
 export type Disposer = () => void;
 
 const NOOP = (): void => {};
 
-/** A scope that runs registered disposers once, in LIFO order. */
+/** 一个按 LIFO 顺序、仅运行一次已注册 disposer 的作用域。 */
 export class DisposableScope {
   private readonly callbacks: Disposer[] = [];
   private disposedFlag = false;
 
-  /** True after dispose() has run. */
+  /** dispose() 已执行后为 true。 */
   get disposed(): boolean {
     return this.disposedFlag;
   }
 
-  /** Number of not-yet-released callbacks. */
+  /** 尚未释放的回调数量。 */
   get size(): number {
     return this.callbacks.length;
   }
 
   /**
-   * Register a cleanup callback. Returns a one-shot disposer that runs this
-   * callback early and removes it from the scope (idempotent). If the scope
-   * has already been disposed, the callback runs immediately.
+   * 注册一个清理回调。返回一个一次性 disposer：可提前执行该回调并把它从
+   * 作用域中移除（幂等）。若作用域已 dispose，回调会立即执行。
    */
   add(callback: Disposer): Disposer {
     if (this.disposedFlag) {
@@ -53,8 +51,8 @@ export class DisposableScope {
   }
 
   /**
-   * Run all registered callbacks in LIFO order, then clear the scope.
-   * Idempotent — subsequent calls are no-ops.
+   * 按 LIFO 顺序运行所有已注册回调，然后清空作用域。
+   * 幂等 —— 后续调用为 no-op。
    */
   dispose(): void {
     if (this.disposedFlag) {

@@ -1,18 +1,16 @@
 /**
- * Weak world reference support.
+ * 弱世界引用支持。
  *
- * The lifecycle only hands modules a `WorldRef` (never the world object
- * directly) so a long-lived module cannot leak a UWorld by holding it
- * strongly. If the host runtime supports `WeakRef` (ES2021+), the reference
- * is truly weak; otherwise we degrade gracefully and do not retain the world
- * at all.
+ * 生命周期只把 `WorldRef`（而非世界对象本身）交给模块，因此长寿模块
+ * 不会因强持有 UWorld 而造成泄漏。若宿主运行时支持 `WeakRef`（ES2021+），
+ * 该引用是真正弱引用；否则优雅降级、完全不保留世界对象。
  *
- * Pure logic — no UE dependency.
+ * 纯逻辑 —— 无 UE 依赖。
  */
 
-/** A weak (or non-retaining) reference to a world object. */
+/** 对世界对象的弱（或不保留的）引用。 */
 export interface WorldRef<TWorld extends object> {
-  /** Returns the referenced world, or null if it has been garbage collected. */
+  /** 返回被引用的世界对象；若已被垃圾回收则返回 null。 */
   get(): TWorld | null;
 }
 
@@ -20,9 +18,9 @@ const supportsWeakRef =
   typeof WeakRef !== "undefined" && typeof FinalizationRegistry !== "undefined";
 
 /**
- * Build a WorldRef. Prefers a true `WeakRef`; on runtimes without WeakRef it
- * returns a reference that does not retain the world (safe — callers must
- * treat a null `get()` as "world is gone").
+ * 构建一个 WorldRef。优先使用真正的 `WeakRef`；在不支持 WeakRef 的运行时，
+ * 返回一个不保留世界的引用（安全 —— 调用方必须把 `get()` 返回 null 视为
+ * 「世界已消失」）。
  */
 export function createWorldRef<TWorld extends object>(world: TWorld): WorldRef<TWorld> {
   if (supportsWeakRef) {
