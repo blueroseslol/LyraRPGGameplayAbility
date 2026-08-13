@@ -29,11 +29,13 @@ public class ShooterCoreRuntime : ModuleRules
 				"LyraGame",
 				"ModularGameplay",
 				"CommonGame",
+				"GameplayTags",	// 公共头文件使用 FGameplayTag（Travel/LyraTravelDestination.h 等）
+				"GameFeatures",	// 公共头文件使用 UGameFeatureAction/UGameFeatureData（GameFeatures/LyraGameFeatureStatics.h 等）
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
-		
+
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -41,7 +43,6 @@ public class ShooterCoreRuntime : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"GameplayTags",
 				"GameplayTasks",
 				"GameplayAbilities",
 				"GameplayMessageRuntime",
@@ -53,7 +54,7 @@ public class ShooterCoreRuntime : ModuleRules
 				"GameSubtitles",
 				"DeveloperSettings",
 				"AIModule"
-				// ... add private dependencies that you statically link with here ...	
+				// ... add private dependencies that you statically link with here ...
 			}
 			);
 		
