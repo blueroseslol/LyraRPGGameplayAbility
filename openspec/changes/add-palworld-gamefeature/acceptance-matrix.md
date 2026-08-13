@@ -27,7 +27,7 @@
 | M1 基线修复（2.1–2.7） | ✅ | — | ✅ | ⬜ | — | — | ⬜ | — |
 | M2 三插件复制（3.1–3.7） | ✅ | — | — | ✅ | — | ⬜ | — | — |
 | M3 GameFeature TS 构建（4.1–4.6） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | — | — |
-| M4 区域传送（5.1–5.7） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | ⬜ | ⬜ |
+| M4 区域传送（5.1–5.7，重定向到 ShooterGame） | ✅ | ✅ | ✅ | ⬜ | — | ⬜ | ⬜ | ⬜ |
 | M5 局内 Phase 与局时（6.1–6.12） | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | M6 装备/属性/伤害（7.1–7.12） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | ⬜ | ⬜ |
 | M7 PVP/死亡/复活（8.1–8.10） | ⬜ | ⬜ | ⬜ | ⬜ | — | ⬜ | ⬜ | ⬜ |
@@ -56,10 +56,13 @@
 - TS typecheck + contract tests：覆盖「重复激活」「重复停用」「VM 重启后重建一次」。
 - Editor 资产：PIE 多实例下每个 GameInstance 独立启动一次脚本。
 
-### M4 区域传送
+### M4 区域传送（2026-08-12 重定向到 ShooterGame）
 
-- Automation：`PalworldCore.Travel.Destination`（按 Tag/按队伍查找）、`PalworldCore.Travel.Authority`（非 Authority 拒绝、未知目标、无队伍）。
-- 双客户端：A 传送进副本区域、B 留在基地；位置正确复制、无 CharacterMovement 回弹、任一方区域加载不强制另一方。
+> 原面向 PalworldCore/PalworldMaps；废弃后改为在 ShooterCoreRuntime + ShooterMaps + `TypeScript/GameFeatures/Shooter/` 上开发，类前缀 `Lyra*`，Automation 测试前缀 `ShooterCore.*`。
+
+- Automation：`ShooterCore.Travel.Destination`（按 Tag 查找、未知 Tag 返回空、按队伍精确匹配、未配置队伍返回空）、`ShooterCore.Travel.Authority`（无控制器 InvalidTarget、非 Authority 拒绝、未知目标、无队伍、通用区域成功）、`ShooterCore.Zone.State`（初始为空、设置可读、Pawn 更换后区域标识保持、重复设置 no-op）——全部通过。
+- Editor 资产：⬜ 未验证（需在编辑器布置传送点/交互点 + PIE 触发验证，对应 5.5 剩余 / 5.6）。
+- 双客户端：⬜ 未验证（5.7，Dedicated Server + 2 客户端）。
 
 ### M5 局内 Phase 与局时
 
