@@ -27,7 +27,7 @@
 | M1 基线修复（2.1–2.7） | ✅ | — | ✅ | ⬜ | — | — | ⬜ | — |
 | M2 三插件复制（3.1–3.7） | ✅ | — | — | ✅ | — | ⬜ | — | — |
 | M3 GameFeature TS 构建（4.1–4.6） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | — | — |
-| M4 区域传送（5.1–5.7，重定向到 ShooterGame） | ✅ | ✅ | ✅ | ⬜ | — | ⬜ | ⬜ | ⬜ |
+| M4 区域传送（5.1–5.7，二次修订：复用 B_Teleport） | ⬜ | ⬜ | ⬜ | ⬜ | — | ⬜ | ⬜ | ⬜ |
 | M5 局内 Phase 与局时（6.1–6.12） | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | M6 装备/属性/伤害（7.1–7.12） | ⬜ | ⬜ | ⬜ | ⬜ | — | — | ⬜ | ⬜ |
 | M7 PVP/死亡/复活（8.1–8.10） | ⬜ | ⬜ | ⬜ | ⬜ | — | ⬜ | ⬜ | ⬜ |
@@ -56,11 +56,12 @@
 - TS typecheck + contract tests：覆盖「重复激活」「重复停用」「VM 重启后重建一次」。
 - Editor 资产：PIE 多实例下每个 GameInstance 独立启动一次脚本。
 
-### M4 区域传送（2026-08-12 重定向到 ShooterGame）
+### M4 区域传送（2026-08-12 重定向到 ShooterGame；二次修订 2026-08-13 复用 `B_Teleport`）
 
 > 原面向 PalworldCore/PalworldMaps；废弃后改为在 ShooterCoreRuntime + ShooterMaps + `TypeScript/GameFeatures/Shooter/` 上开发，类前缀 `Lyra*`，Automation 测试前缀 `ShooterCore.*`。
+> **二次修订**：自研传送 C++/TS（`ShooterCore.Travel.*` / `ShooterCore.Zone.State`）已删除，改复用 Lyra 现成 `B_Teleport`（接入由用户处理）；下方「全部通过」记录作废。
 
-- Automation：`ShooterCore.Travel.Destination`（按 Tag 查找、未知 Tag 返回空、按队伍精确匹配、未配置队伍返回空）、`ShooterCore.Travel.Authority`（无控制器 InvalidTarget、非 Authority 拒绝、未知目标、无队伍、通用区域成功）、`ShooterCore.Zone.State`（初始为空、设置可读、Pawn 更换后区域标识保持、重复设置 no-op）——全部通过。
+- Automation：⬜ 未验证（原 `ShooterCore.Travel.*` / `ShooterCore.Zone.State` 自研实现已删除，改用 `B_Teleport` 后对应测试待定）。
 - Editor 资产：⬜ 未验证（需在编辑器布置传送点/交互点 + PIE 触发验证，对应 5.5 剩余 / 5.6）。
 - 双客户端：⬜ 未验证（5.7，Dedicated Server + 2 客户端）。
 
@@ -73,13 +74,13 @@
 
 ### M6 装备/属性/伤害
 
-- Automation：`PalworldCore.Equipment.Slots`、`PalworldCore.Equipment.Authority`（非 Authority 拒绝、槽位不匹配、已占用更替）、`PalworldCore.Damage.Execution`（攻击提升、防御提升、防御高于攻击取零）、「连续重建三次属性不累积」。
+- Automation：`ShooterCore.Equipment.Slots`、`ShooterCore.Equipment.Authority`（非 Authority 拒绝、槽位不匹配、已占用更替）、`ShooterCore.Damage.Execution`（攻击提升、防御提升、防御高于攻击取零）、「连续重建三次属性不累积」。
 - 双客户端：装备后属性提升并复制、卸下后精确还原、多件装备互不干扰。
 - 回归：ShooterCore Experience 中射击伤害与本变更前一致。
 
 ### M7 PVP/死亡/复活
 
-- Automation：`PalworldCore.Death.Drop`（有物品掉落、空背包不生成、装备槽保留）、`PalworldCore.Spawn.TeamBase`（按队伍过滤、无队伍回退）。
+- Automation：`ShooterCore.Death.Drop`（有物品掉落、空背包不生成、装备槽保留）、`ShooterCore.Spawn.TeamBase`（按队伍过滤、无队伍回退）。
 - 双客户端：队友互射零伤害、敌队正常伤害、基地内可交战；A 击杀 B → 尸包可拾取 → B 在本队基地重生且装备仍在；两队复活隔离。
 
 ### M8 交互/拾取/UI

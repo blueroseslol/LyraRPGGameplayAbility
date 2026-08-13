@@ -1,6 +1,6 @@
 ## 变更状态：方向修订（2026-08-12）
 
-> **⚠️ 方案调整**：M2 复制 Shooter→Palworld 三插件导致同名资产冲突、ShooterGame 无法使用，已删除 PalworldCore/Explorer/Maps 并移除 uproject 注册。**改为直接在 ShooterGame 上开发**，保留「搜打撤 + 分队对抗」玩法目标。**保留项**：M0 文档记录（基线/边界/验收矩阵）；M1 基线修复（`AddEntry(ItemInstance)`、`WaitDebugger` 注释、`LyraGame.Inventory.AddItemInstance` 测试、GameInstance Shutdown 释放 FJsEnv）已并入 ShooterGame 持续有效；M2 执行记录（3.1-3.8）作为「方案不可行」教训保留。**M3 按新方向重定向继续（见第 4 节）；M4-M9 待后续按「直接在 ShooterGame 上开发」重定向规划**。详见 proposal.md 顶部方向修订标注。
+> **⚠️ 方案调整**：M2 复制 Shooter→Palworld 三插件导致同名资产冲突、ShooterGame 无法使用，已删除 PalworldCore/Explorer/Maps 并移除 uproject 注册。**改为直接在 ShooterGame 上开发**，保留「搜打撤 + 分队对抗」玩法目标。**保留项**：M0 文档记录（基线/边界/验收矩阵）；M1 基线修复（`AddEntry(ItemInstance)`、`WaitDebugger` 注释、`LyraGame.Inventory.AddItemInstance` 测试、GameInstance Shutdown 释放 FJsEnv）已并入 ShooterGame 持续有效；M2 执行记录（3.1-3.8）作为「方案不可行」教训保留。**M3 按新方向重定向继续（见第 4 节）；M4-M9 已按「直接在 ShooterGame 上开发」重定向（见第 5-10 节）**。详见 proposal.md 顶部方向修订标注。
 
 ## 0. 约定
 
@@ -48,28 +48,32 @@
 - [x] 4.5 以最小方式接入 `TypeScript/Main.ts`（保留用户既有代码，只增加一次 bootstrap 调用）；验证：`npm run typecheck`，并在 PIE 多实例下确认每个 GameInstance 独立启动一次，需要 Unreal Editor。**（已实施：`TypeScript/Main.ts` 仅新增一行 `BootstrapGameFeatures(GameInstance)`；新增 `TypeScript/GameFeatures/Bootstrap.ts` 作为 UE 引导层——唯一 import `ue`/`puerts` 的文件，构建 `LifecycleAdapters`（World 惰性弱引用、`K2_SetTimerDelegate`+`puerts.toDelegate` 定时器、`puerts.on/off` 事件总线），模块级 `RebuildGuard` 保证同一 VM 代数只引导一次（PIE 多实例各自独立 VM），并导出 `ShutdownGameFeatures()` 供 `GameInstance::Shutdown` Reset 前停用清理；`npm run typecheck` 通过；**PIE 多实例已验证：单实例 + 2 个 Standalone 共 6 个 GameInstance，每个恰好激活一次、无重复引导**）**
 - [x] 4.6 为 ShooterGame 建立 GameFeature TS 入口（activate/deactivate 入口 + 服务组装根，替代原 Palworld 内容插件入口）；验证：`npm run typecheck`，停用后作用域内无残留注册。**（已实施：`TypeScript/GameFeatures/Shooter/`——`CreateShooterGameFeature()` 在 Activate 时经 `ServiceRegistry` 组装服务并挂到 Ctx 作用域、订阅 `GameplayRuntime.Start` 事件，Deactivate 由生命周期对称释放；`RegisterShooterGameFeatures()` 供 bootstrap 注册；新增 `Tests/ShooterContractTests.ts` 7 个测试覆盖服务组装/释放、事件拆除、重复注册幂等、激活中注销对称释放、ServiceRegistry 覆盖/逆序释放/释放后忽略注册，全部通过；`npm run typecheck` 通过）**
 
-## 5. 里程碑 M4：区域传送与玩家区域状态（重定向到 ShooterGame，2026-08-12）
+## 5. 里程碑 M4：区域传送与玩家区域状态（重定向到 ShooterGame，2026-08-12；二次修订 2026-08-13 复用 Lyra 传送门）
 
 > **方向修订**：M2 已删除 Palworld 三插件。M4 改为**直接在 ShooterGame 上开发**——C++ 落点为 `Plugins/GameFeatures/ShooterCore/Source/ShooterCoreRuntime/`（类前缀 `Lyra*`，沿用该模块既有命名），Automation 测试前缀为 `ShooterCore.*`，地图落点为 `ShooterMaps`，TS 编排落点为 `TypeScript/GameFeatures/Shooter/Services/`（沿用 M3 纯逻辑 + contract tests 模式）。新玩法 Tag 统一使用 `ShooterGame.*` 前缀（沿袭 M3 方向修订约定）。
+>
+> **二次修订（2026-08-13，复用 Lyra 现成传送门）**：下方 5.1–5.5 的自研传送实现（C++ `ALyraTravelDestination` / `ULyraTravelStatics` / `ELyraTravelResult` / `ULyraZoneStateComponent` / `ALyraTravelInteractionPoint`，TS `TravelCoordinator` / `TravelGateway` / `TravelTypes`）已**全部删除**，改为复用 Lyra 现成传送门 Actor `B_Teleport`（`ShooterCore/Content/Blueprint/B_Teleport` + `GCNL_Teleporter_Activate` GameplayCue），**其接入由用户处理**。5.1–5.5 的「已实施」记录作废，仅保留 git 历史。
+>
+> **待定**：玩家当前区域 Tag 复制（原 `ULyraZoneStateComponent` 职责）是否补回一个最小 C++ 组件，取决于 `B_Teleport` 的接入方式——若 `B_Teleport` 不提供「按区域/队伍寻址 + 区域状态复制」，再单独补回该组件（保留原「仅区域 Tag 复制 + OnRep 广播」思路）。
 
 - [x] 5.1 在 `Plugins/GameFeatures/ShooterCore/Source/ShooterCoreRuntime/` 实现传送目标点 Actor `ALyraTravelDestination`，携带区域 Tag，基地点另带队伍标识（`AreaTag` / `TeamId`（0=不限队伍，>0=队伍基地）/ `DisplayName`）；验证：编译通过 + 新增 `ShooterCore.Travel.Destination` Automation 测试覆盖「按 Tag 查找」「按队伍查找」。**（已实施：`Public|Private/Travel/LyraTravelDestination.*`；Automation 测试通过——按 Tag 命中、未知 Tag 返回空、按队伍精确匹配（`FindTeamBase` 只认 `TeamId` 精确相等，通用区域 TeamId=0 不算任何队基地）、未配置队伍返回空）**
 - [x] 5.2 在同模块实现 Authority 安全的传送接口 `ULyraTravelStatics`（静态工具类 + `ELyraTravelResult` 枚举），函数体内校验 World、目标 Actor、Authority、目标点存在性与队伍归属，返回可诊断枚举（Success/NotAuthority/InvalidTarget/UnknownDestination/NoTeam）；验证：新增 `ShooterCore.Travel.Authority` Automation 测试覆盖非 Authority 拒绝、未知目标、无队伍、成功四条路径。**（已实施：`Public|Private/Travel/LyraTravelTypes.h`（枚举）+ `LyraTravelStatics.*`（`FindDestination`/`FindTeamBase`/`TeleportToArea`/`GetCurrentZoneTag`）；Automation 测试通过——无控制器 InvalidTarget、`SetRole(ROLE_SimulatedProxy)` 模拟客户端 NotAuthority、未知 Tag UnknownDestination、队伍受限目标无队伍 NoTeam、通用区域 Success）**
 - [x] 5.3 在 PlayerState 侧扩展玩家当前区域 Tag 的复制状态 `ULyraZoneStateComponent`（挂载于 PlayerState 的组件，不修改 `ALyraPlayerState`；ReplicatedUsing=OnRep + GameplayMessage 广播）；验证：编译通过 + Automation 测试覆盖「设置/读取」与「Pawn 更换后区域标识保持」。**（已实施：`Public|Private/Travel/LyraZoneStateComponent.*`，`SetIsReplicatedByDefault(true)`，`DOREPLIFETIME(CurrentZoneTag)`，OnRep 时经 `GameplayMessageSubsystem` 广播 `ShooterGame.Zone.Changed` 频道 `FLyraZoneChangedMessage`（`HasInstance` 守卫，无 GameInstance 环境跳过）；Automation 测试通过——初始为空、设置可读、模拟 Pawn 更换后标识保持、重复设置 no-op）**
 - [x] 5.4 在 TypeScript 实现传送编排服务 `TravelCoordinator`（`TypeScript/GameFeatures/Shooter/Services/`）：判定谁能传、传到哪，非 Authority 快速失败，并调用 5.2 的 C++ 接口、按返回码分支；验证：`npm run typecheck` + contract tests 覆盖非 Authority 快速失败与 C++ 返回码分支。**（已实施：`TravelTypes.ts`（`TravelResult` 枚举镜像 `ELyraTravelResult` + TS 侧 `SameZone`）、`TravelGateway.ts`（接口 + `CreateNullTravelGateway` 保守空网关）、`TravelCoordinator.ts`（非 Authority 快速失败 → 同区域 `SameZone` no-op → 调 C++ 网关按返回码分支）；`ShooterFeature` Activate 注册 `travel.coordinator` 服务（`CreateTravelGateway` 可注入，Bootstrap 注入真实 UE 网关）；Bootstrap `CreateUeTravelGateway` 经 `GameplayStatics.GetPlayerController` 惰性解析 PC + `ULyraTravelStatics` 权威接口；`TypeScript/GameFeatures/UeDeclarations.d.ts` 临时声明新 C++ 类（PuerTS 重新生成后可删）；contract tests 6 个通过，typecheck 通过）**
 - [x] 5.5 C++ 基座：实现交互式传送入口 `ALyraTravelInteractionPoint`（直接实现 `IInteractableTarget`，而非继承拾取专用的 `ALyraWorldCollectable`——传送点不是可拾取物），`GatherInteractionOptions` 暴露 `FInteractionOption`（`InteractionAbilityToGrant` + 文本），`CustomizeInteractionEventData` 把 `DestinationAreaTag` 写入事件 `TargetTags` 供 BP 能力读取；使用与拾取相同的交互输入（`InputTag.Ability.Interact`）；验证：编译通过。**（剩余需 Unreal Editor：创建 `GA_Travel` 资产并配置 `InteractionAbilityToGrant`、地图布置交互点、PIE 单客户端「按 F 触发传送」）**
-- [ ] 5.6 在 `ShooterMaps` 的 World Partition 地图（沿用 `L_Expanse`）中布置两队基地与至少两个可探索区域的传送点，并确认服务器端流送配置允许按各客户端位置流送；验证：需要 Unreal Editor。
+- [ ] 5.6 在 `ShooterMaps` 的 World Partition 地图（沿用 `L_Expanse`）中用 `B_Teleport` 布置两队基地与至少两个可探索区域的传送点，并确认服务器端流送配置允许按各客户端位置流送；验证：需要 Unreal Editor（与用户确认 `B_Teleport` 接入方式后执行）。
 - [ ] 5.7 双客户端验收区域隔离与位置复制：A 传送进副本区域、B 留在其队伍基地；验证：Dedicated Server + 2 客户端，确认双方位置正确复制、无 CharacterMovement 回弹、任一方的区域加载不强制另一方加载，对应 `world-zone-travel` 的分散区域场景。
 
 ## 6. 里程碑 M5：局内 Phase 与全局局时
 
-- [ ] 6.1 在 Palworld 插件 `Config/Tags/` 定义 Phase Tag 层级：`Palworld.GamePhase.Warmup`、`.Playing`、`.Playing.Free`、`.Extract`、`.MatchEnd`（Extract 为 Playing 的兄弟）；验证：Editor 启动无 Tag 冲突，需要 Unreal Editor。
+- [ ] 6.1 在 ShooterCore 插件 `Config/Tags/` 定义 Phase Tag 层级：`ShooterGame.GamePhase.Warmup`、`.Playing`、`.Playing.Free`、`.Extract`、`.MatchEnd`（Extract 为 Playing 的兄弟）；验证：Editor 启动无 Tag 冲突，需要 Unreal Editor。
 - [ ] 6.2 创建继承 `ULyraGamePhaseAbility` 的 Phase 类探针（优先保存型 TypeScript Blueprint），验证父类、`GamePhaseTag` CDO 默认值、类软引用与编辑器重启后引用有效；验证：保存后关闭并重启 Unreal Editor，需要 Unreal Editor。
 - [ ] 6.3 对 6.2 探针执行 Development Cook/Stage 并在 Standalone 与 Dedicated Server 加载；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/RunUAT.bat BuildCookRun -project=D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -skiparchive`。
 - [ ] 6.4 若 6.3 失败，改用无 Event Graph 的 Phase GA Blueprint 配置壳（只填 `GamePhaseTag`），规则保留在 TypeScript Coordinator；验证：重复 6.2-6.3 并在验收矩阵记录最终采用路径。
-- [ ] 6.5 在 TypeScript 实现回合协调器，仅 Authority 驱动 Warmup→Playing→Extract→MatchEnd，并按模式配置决定是否注册局时计时器；验证：`npm run typecheck` + contract tests 覆盖正常流程、重复结束、客户端请求推进被拒三条路径。
+- [ ] 6.5 在 TypeScript（`TypeScript/GameFeatures/Shooter/Services/`）实现回合协调器，仅 Authority 驱动 Warmup→Playing→Extract→MatchEnd，并按模式配置决定是否注册局时计时器；验证：`npm run typecheck` + contract tests 覆盖正常流程、重复结束、客户端请求推进被拒三条路径。
 - [ ] 6.6 在 GameState 侧复制「局时结束的服务器时间戳」，客户端按该时间戳本地插值显示剩余时间；验证：编译通过 + Automation 测试覆盖时间戳复制。
 - [ ] 6.7 实现 Extract 阶段的按队伍分流撤离：遍历所有 PlayerState，各自传送回本队基地；验证：`npm run typecheck` + contract tests。
-- [ ] 6.8 创建自由模式与计时模式两套 ExperienceDefinition 与 UserFacingExperience 配置实例；验证：Asset Manager 可解析 Primary Asset ID 且无缺失引用，需要 Unreal Editor。
+- [ ] 6.8 在 ShooterCore 上创建自由模式与计时模式两套 ExperienceDefinition 与 UserFacingExperience 配置实例；验证：Asset Manager 可解析 Primary Asset ID 且无缺失引用，需要 Unreal Editor。
 - [ ] 6.9 双客户端验收阶段顺序与局时一致性：两名玩家分处不同区域时观察到一致的阶段顺序与剩余局时；验证：Dedicated Server + 2 客户端，对应 `match-phase-lifecycle` 的全局局时复制场景。
 - [ ] 6.10 双客户端验收撤离分流：计时模式局时耗尽后两队玩家各自被传回本队基地；验证：Dedicated Server + 2 客户端（两队各一名）。
 - [ ] 6.11 验收自由模式不触发强制撤离，且界面不展示局时倒计时；验证：Standalone + PIE。
@@ -77,14 +81,14 @@
 
 ## 7. 里程碑 M6：装备槽、属性与伤害
 
-- [ ] 7.1 在 `PalworldCoreRuntime` 实现装备槽组件（挂载于 PlayerState），槽位以 GameplayTag 寻址，状态使用 `FFastArraySerializer` 复制，物品实例作为子对象注册；验证：编译通过 + 新增 `PalworldCore.Equipment.Slots` Automation 测试。
-- [ ] 7.2 在 Palworld 插件 `Config/Tags/` 定义槽位 Tag：`Palworld.Equip.Slot.Head`、`.Body`、`.Legs`、`.Accessory1`、`.Accessory2`；验证：Editor 启动无 Tag 冲突，需要 Unreal Editor。
-- [ ] 7.3 在 `PalworldCoreRuntime` 实现装备槽 Inventory Fragment，声明物品可进入的槽位 Tag 与其属性效果类；验证：编译通过 + Automation 测试覆盖「装备到不匹配槽位被拒绝」。
-- [ ] 7.4 在 `PalworldCoreRuntime` 实现 `UPalAttributeSet`，仅含攻击与防御两项属性（生命值继续用 `ULyraHealthSet`，不重复定义）；验证：编译通过 + Automation 测试覆盖属性复制。
-- [ ] 7.5 实现 Authority 安全的装备/卸下写入：装备时施加属性效果并记录句柄，卸下时按句柄精确移除；写入前二次校验 Authority 与槽位合法性并返回可诊断枚举；验证：新增 `PalworldCore.Equipment.Authority` Automation 测试覆盖非 Authority 拒绝、槽位不匹配、已占用槽位更替三条路径。
+- [ ] 7.1 在 `ShooterCoreRuntime` 实现装备槽组件（挂载于 PlayerState），槽位以 GameplayTag 寻址，状态使用 `FFastArraySerializer` 复制，物品实例作为子对象注册；验证：编译通过 + 新增 `ShooterCore.Equipment.Slots` Automation 测试。
+- [ ] 7.2 在 ShooterCore 插件 `Config/Tags/` 定义槽位 Tag：`ShooterGame.Equip.Slot.Head`、`.Body`、`.Legs`、`.Accessory1`、`.Accessory2`；验证：Editor 启动无 Tag 冲突，需要 Unreal Editor。
+- [ ] 7.3 在 `ShooterCoreRuntime` 实现装备槽 Inventory Fragment，声明物品可进入的槽位 Tag 与其属性效果类；验证：编译通过 + Automation 测试覆盖「装备到不匹配槽位被拒绝」。
+- [ ] 7.4 在 `ShooterCoreRuntime` 实现 `UPalWorldAttackDefenseSet`（仅含攻击与防御两项属性；**复制 `Source/LyraGame/AbilitySystem/Attributes/LyraCombatSet.*` 后重命名修改**；生命值继续用 `ULyraHealthSet`，不重复定义）；验证：编译通过 + Automation 测试覆盖属性复制。
+- [ ] 7.5 实现 Authority 安全的装备/卸下写入：装备时施加属性效果并记录句柄，卸下时按句柄精确移除；写入前二次校验 Authority 与槽位合法性并返回可诊断枚举；验证：新增 `ShooterCore.Equipment.Authority` Automation 测试覆盖非 Authority 拒绝、槽位不匹配、已占用槽位更替三条路径。
 - [ ] 7.6 实现 Pawn 重生后按当前槽位内容重新施加属性效果，且施加前先移除已记录旧句柄以保证幂等；验证：Automation 测试覆盖「连续重建三次后属性数值不累积」。
-- [ ] 7.7 在 `PalworldCoreRuntime` 实现 `UPalDamageExecution`，捕获攻击（Source）与防御（Target）属性，沿用队伍许可乘数与距离/材质衰减，最终值取 `Max(..., 0)`；验证：编译通过 + 新增 `PalworldCore.Damage.Execution` Automation 测试覆盖攻击提升、防御提升、防御高于攻击取零三个场景。
-- [ ] 7.8 将 PalworldCore 复制来的 `GE_Damage_*` 资产改指向 `UPalDamageExecution`；ShooterCore 的资产保持指向 `ULyraDamageExecution`；验证：需要 Unreal Editor。
+- [ ] 7.7 在 `ShooterCoreRuntime` 实现 `UPalWorldAttackDefenseExecution`（捕获攻击（Source）与防御（Target）属性，沿用队伍许可乘数与距离/材质衰减，最终值取 `Max(..., 0)`；**复制 `Source/LyraGame/AbilitySystem/Executions/LyraDamageExecution.*` 后重命名修改**，不修改原 `ULyraDamageExecution`）；验证：编译通过 + 新增 `ShooterCore.Damage.Execution` Automation 测试覆盖攻击提升、防御提升、防御高于攻击取零三个场景。
+- [ ] 7.8 新增/配置指向 `UPalWorldAttackDefenseExecution` 的 `GE_Damage_*` 资产；原 Shooter 的 `GE_Damage_*` 保持指向 `ULyraDamageExecution`；验证：需要 Unreal Editor。
 - [ ] 7.9 新增装备槽变更的 GameplayMessage Tag 与消息结构，供 UI 订阅；验证：编译通过。
 - [ ] 7.10 在 TypeScript 实现装备操作意图提交与前置校验，写入经 7.5 的 C++ 边界；验证：`npm run typecheck` + contract tests。
 - [ ] 7.11 双客户端验收装备属性：装备后属性提升并复制、卸下后精确还原、多件装备互不干扰；验证：Dedicated Server + 2 客户端，对应 `equipment-slots-and-attributes` 全部场景。
@@ -92,11 +96,11 @@
 
 ## 8. 里程碑 M7：PVP、死亡掉落与按队伍复活
 
-- [ ] 8.1 在 Palworld Experience 中挂载队伍创建组件（复用 `B_TeamSetup_TwoTeams` 的人数平衡策略）与队伍显示资产；验证：需要 Unreal Editor，2-4 名玩家场景中队伍人数差不超过 1。
-- [ ] 8.2 在 `PalworldCoreRuntime` 实现死亡掉落：监听死亡开始，读取背包全部物品实例，生成可拾取容器并清空背包，装备槽不变；背包为空时不生成容器；验证：编译通过 + 新增 `PalworldCore.Death.Drop` Automation 测试覆盖「有物品掉落」「空背包不生成」「装备槽保留」。
-- [ ] 8.3 配置尸包容器资产（继承 PalworldCore 的可拾取基类），使其可被其他玩家拾取；验证：需要 Unreal Editor。
-- [ ] 8.4 在 `PalworldCoreRuntime` 实现按队伍基地过滤的出生点选择组件，覆写 `OnChoosePlayerStart`：按 `ALyraPlayerStart::StartPointTags` 的队伍标记过滤本队基地点位，再选未占用者；玩家无队伍时返回 nullptr 交由上游回退；验证：编译通过 + 新增 `PalworldCore.Spawn.TeamBase` Automation 测试覆盖「按队伍过滤」「无队伍回退」。
-- [ ] 8.5 在 Palworld Experience 中挂载 8.4 的出生点组件（替代复制来的 TDM「离敌人最远」组件，两者并存不互相修改）；验证：需要 Unreal Editor。
+- [ ] 8.1 在 ShooterCore 的搜打撤 Experience 中挂载队伍创建组件（复用 `B_TeamSetup_TwoTeams` 的人数平衡策略）与队伍显示资产；验证：需要 Unreal Editor，2-4 名玩家场景中队伍人数差不超过 1。
+- [ ] 8.2 在 `ShooterCoreRuntime` 实现死亡掉落：监听死亡开始，读取背包全部物品实例，生成可拾取容器并清空背包，装备槽不变；背包为空时不生成容器；验证：编译通过 + 新增 `ShooterCore.Death.Drop` Automation 测试覆盖「有物品掉落」「空背包不生成」「装备槽保留」。
+- [ ] 8.3 配置尸包容器资产（继承 ShooterCore 的可拾取基类），使其可被其他玩家拾取；验证：需要 Unreal Editor。
+- [ ] 8.4 在 `ShooterCoreRuntime` 实现按队伍基地过滤的出生点选择组件，覆写 `OnChoosePlayerStart`：按 `ALyraPlayerStart::StartPointTags` 的队伍标记过滤本队基地点位，再选未占用者；玩家无队伍时返回 nullptr 交由上游回退；验证：编译通过 + 新增 `ShooterCore.Spawn.TeamBase` Automation 测试覆盖「按队伍过滤」「无队伍回退」。
+- [ ] 8.5 在 ShooterCore 的搜打撤 Experience 中挂载 8.4 的出生点组件（替代复制来的 TDM「离敌人最远」组件，两者并存不互相修改）；验证：需要 Unreal Editor。
 - [ ] 8.6 为两队基地布置带队伍标记的 PlayerStart；验证：需要 Unreal Editor。
 - [ ] 8.7 配置重生流程（复用 `GA_AutoRespawn` 与重生倒计时 UI）指向队伍基地；验证：需要 Unreal Editor，PIE 单客户端确认死亡后在本队基地重生。
 - [ ] 8.8 双客户端验收 PVP 分队语义：队友互射零伤害、敌队正常伤害、基地内可交战（无免伤保护区）；验证：Dedicated Server + 2 客户端（两队各一名），对应 `combat-teams-and-death` 分队伤害语义全部场景。
@@ -105,8 +109,8 @@
 
 ## 9. 里程碑 M8：交互、拾取与 UI
 
-- [ ] 9.1 将交互输入键位改为 F（修改 Palworld 的输入映射资产，Tag 沿用 `InputTag.Ability.Interact`）；验证：需要 Unreal Editor，PIE 确认按 F 触发交互。
-- [ ] 9.2 配置可拾取物品资产（继承 PalworldCore 的可拾取基类，使用能力授予交互者模式）；验证：需要 Unreal Editor，PIE 确认拾取进背包。
+- [ ] 9.1 将交互输入键位改为 F（修改 ShooterCore 的输入映射资产，Tag 沿用 `InputTag.Ability.Interact`）；验证：需要 Unreal Editor，PIE 确认按 F 触发交互。
+- [ ] 9.2 配置可拾取物品资产（继承 ShooterCore 的可拾取基类，使用能力授予交互者模式）；验证：需要 Unreal Editor，PIE 确认拾取进背包。
 - [ ] 9.3 实现带 GAS 的机关 Actor，使用目标侧执行模式（`TargetAbilitySystem` + `TargetInteractionAbilityHandle`），响应能力在机关自身 ASC 上由服务器执行；验证：编译通过（若需新 C++ 基类）+ 需要 Unreal Editor，PIE 确认触发。
 - [ ] 9.4 配置交互提示 UI（复用 `W_InteractionPrompt`），确认进入/离开范围时提示正确出现与消失；验证：需要 Unreal Editor，PIE 覆盖 `interaction-and-pickup` 的提示展示场景。
 - [ ] 9.5 双客户端验收拾取竞争：两名玩家几乎同时拾取同一物品，该物品最多结算一次；验证：Dedicated Server + 2 客户端。
@@ -124,9 +128,9 @@
 
 - [ ] 10.1 执行完整 TypeScript 验证；验证：在项目根执行 `npm run typecheck`、`npm run build` 与全部 contract tests，并确认 `Content/JavaScript/GameFeatures` 下脚本产物存在。
 - [ ] 10.2 执行完整 C++ 编译；验证：`D:/UnrealEngine/UE_5.7/Engine/Build/BatchFiles/Build.bat LyraEditor Win64 Development D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -WaitMutex`。
-- [ ] 10.3 执行全部 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory+PalworldCore;Quit" -unattended -nopause`。
-- [ ] 10.4 执行 Development Cook/Stage，确认 Stage 目录同时包含 PuerTS runtime 包、`Main` 脚本与 Palworld GameFeature 脚本产物；验证：`RunUAT.bat BuildCookRun -project=D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -skiparchive`，无缺失 Primary Asset 或 GameplayTag 日志。
-- [ ] 10.5 完成 Palworld 完整联机验收：Host/Join、Feature 激活、Warmup 至 MatchEnd、区域传送、分队伤害、装备属性、死亡掉落与按队伍复活、晚加入、Feature 停用清理全部通过；验证：Dedicated Server + 2 客户端。
+- [ ] 10.3 执行全部 Automation 测试；验证：`D:/UnrealEngine/UE_5.7/Engine/Binaries/Win64/UnrealEditor-Cmd.exe D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -NullRHI -ExecCmds="Automation RunTests LyraGame.Inventory+ShooterCore;Quit" -unattended -nopause`。
+- [ ] 10.4 执行 Development Cook/Stage，确认 Stage 目录同时包含 PuerTS runtime 包、`Main` 脚本与搜打撤玩法脚本产物；验证：`RunUAT.bat BuildCookRun -project=D:/MatrixTA/LyraRPGGameplayAbility/LyraStarterGame.uproject -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -skiparchive`，无缺失 Primary Asset 或 GameplayTag 日志。
+- [ ] 10.5 完成搜打撤完整联机验收：Host/Join、Feature 激活、Warmup 至 MatchEnd、区域传送、分队伤害、装备属性、死亡掉落与按队伍复活、晚加入、Feature 停用清理全部通过；验证：Dedicated Server + 2 客户端。
 - [ ] 10.6 完成原 Shooter 三件套最终回归：Elimination 与 ControlPoint 两个 Experience 各完成一局，伤害与出生点行为与本变更前一致；验证：Dedicated Server + 2 客户端，记入验收矩阵。
 - [ ] 10.7 完成验收矩阵填写，未运行项显式标注为未验证；验证：矩阵评审。
 - [ ] 10.8 编写资产交接文档，逐项标记必须创建、可替换、已验证或已回退的资产，并附 Phase、PawnData、装备栏、传送点的引用位置；验证：用户无需阅读 C++ 即可完成视觉资产替换。

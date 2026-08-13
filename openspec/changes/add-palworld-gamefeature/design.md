@@ -1,3 +1,5 @@
+> **方向修订（2026-08-13）**：本 design.md 写于「复制 Shooter→Palworld 三平行插件」方案下，该方案已废弃（见 proposal.md 顶部）。命名重定向如下，正文中的旧名请按下表理解：`PalworldCore`/`PalworldCoreRuntime` → `ShooterCore`/`ShooterCoreRuntime`；`Palworld.*` Tag → `ShooterGame.*`；`Pal*`/`UPal*` 类前缀 → `Lyra*`/`ULyra*`（避开已存在的 `ULyraAttributeSet` 基类 / `ULyraHealthSet` / `ULyraCombatSet` / `ULyraDamageExecution`，具体新类名以 tasks.md 为准）；`Palworld Experience` → ShooterCore 上的搜打撤 Experience。除决策 1（平行插件）与命名外，其余技术决策（PlayerState 挂槽、FFastArraySerializer、Phase Tag 父子语义、C++/TS 切分等）仍然有效。
+
 ## Context
 
 见 [proposal.md](proposal.md) 的 Why 与 Impact。以下是塑造本设计的既有代码事实（均已在实施前核实）：
@@ -90,19 +92,19 @@
 
 新组件与 `ULyraQuickBarComponent` 平行共存，互不替代：QuickBar 管快捷武器切换（沿用 Lyra 既有链路），装备槽管穿戴与属性。物品可通过不同 Fragment 分别声明"可进入 QuickBar"与"可进入某穿戴槽"。
 
-槽位状态使用 `FFastArraySerializer` 复制，物品实例作为子对象注册，与 `FLyraInventoryList` 的模式一致。槽位以 `FGameplayTag` 寻址（`Palworld.Equip.Slot.Head` 等），而非固定索引，使新增槽位不破坏既有存档与复制布局。
+槽位状态使用 `FFastArraySerializer` 复制，物品实例作为子对象注册，与 `FLyraInventoryList` 的模式一致。槽位以 `FGameplayTag` 寻址（`ShooterGame.Equip.Slot.Head` 等），而非固定索引，使新增槽位不破坏既有存档与复制布局。
 
 **属性效果的重建时机**：装备产生的 `FActiveGameplayEffectHandle` 是服务器侧状态且不复制（与 Lyra 的 `GrantedHandles` 一致）。Pawn 重生后 ASC 重新初始化，服务器需按当前槽位内容重新施加一次效果。设计要求这一步幂等——先移除已记录的旧句柄再施加，避免规格中"不出现重复叠加"的失败场景。
 
 替代方案是把装备槽做成 `ULyraEquipmentManagerComponent` 的子类。该方案能复用其 AbilitySet 授予与 Actor spawn 逻辑，但继承了 `UPawnComponent` 的生命周期，与"死亡保留装备"直接冲突，故不采用；确需装备附带能力时，由装备槽组件在写入后调用 Pawn 侧的既有装备管理器。
 
-### 4. 新建 PalDamageExecution，不修改 LyraDamageExecution
+### 4. 新建攻击防御 Execution，不修改 LyraDamageExecution
 
 规格 `combat-teams-and-death` 同时要求"攻防参与结算"与"原 Shooter 伤害不受影响"。修改 `ULyraDamageExecution` 会同时改变 ShooterCore 所有 `GE_Damage_*` 的行为，违反后者。
 
-因此在 `PalworldCoreRuntime` 新建 `UPalDamageExecution`，捕获攻击（Source）与防御（Target）属性，并沿用 Lyra 的队伍许可乘数与距离/材质衰减语义。复制到 PalworldCore 的 `GE_Damage_*` 资产改指向新 Execution；ShooterCore 的资产保持指向 `ULyraDamageExecution`。
+因此在 `ShooterCoreRuntime` 新建 `UPalWorldAttackDefenseExecution`（复制 `Source/LyraGame/AbilitySystem/Executions/LyraDamageExecution.*` 后重命名修改），捕获攻击（Source）与防御（Target）属性，并沿用 Lyra 的队伍许可乘数与距离/材质衰减语义。新增/配置的 `GE_Damage_*` 资产改指向新 Execution；原 Shooter 的资产保持指向 `ULyraDamageExecution`。
 
-攻防属性放在新的 `UPalAttributeSet`（`PalworldCoreRuntime`），只含攻击与防御两项；生命值继续使用 `ULyraHealthSet`，不重复定义。
+攻防属性放在新的 `UPalWorldAttackDefenseSet`（`ShooterCoreRuntime`，复制 `Source/LyraGame/AbilitySystem/Attributes/LyraCombatSet.*` 后重命名修改），只含攻击与防御两项；生命值继续使用 `ULyraHealthSet`，不重复定义。
 
 **伤害下限**：规格要求"防御高于攻击时最终伤害为零而非负值"。Execution 内在输出前对最终值取 `Max(..., 0)`，与 Lyra 现有做法一致。具体的攻防合成公式（减法、除法或曲线）留待实施时确定，不影响本设计的模块边界与规格可验证性。
 
@@ -126,11 +128,11 @@ TypeScript 侧负责"何时传送谁到哪"的编排（撤离流程、交互入�
 `ULyraGamePhaseSubsystem` 的语义是：新 Phase 若不是当前 Phase 的后代，则取消当前 Phase（`MatchesTag` 判定）。据此设计 Tag 层级：
 
 ```text
-Palworld.GamePhase.Warmup
-Palworld.GamePhase.Playing
-Palworld.GamePhase.Playing.Free      // 自由模式，与 Playing 共存
-Palworld.GamePhase.Extract           // Playing 的兄弟，启动时自动取消 Playing 及其子 Phase
-Palworld.GamePhase.MatchEnd
+ShooterGame.GamePhase.Warmup
+ShooterGame.GamePhase.Playing
+ShooterGame.GamePhase.Playing.Free   // 自由模式，与 Playing 共存
+ShooterGame.GamePhase.Extract        // Playing 的兄弟，启动时自动取消 Playing 及其子 Phase
+ShooterGame.GamePhase.MatchEnd
 ```
 
 把 Extract 设为 Playing 的兄弟而非子级，是为了让"撤离阶段启动 → 进行阶段结束"由子系统的既有语义自动保证，无需在 TS 中手工取消，减少漏取消的失败模式。
@@ -143,9 +145,9 @@ Phase GA 类的承载方式沿用既有方向：优先尝试保存型 TypeScript
 
 ### 7. 复活点按队伍基地过滤，替换而非修改 TDM 组件
 
-复制到 PalworldCore 的 `UTDM_PlayerSpawningManagmentComponent` 实现的是"离敌人最远"，与"回本队基地"冲突。设计为在 `PalworldCoreRuntime` 新建出生点组件，覆写 `OnChoosePlayerStart`：按 `ALyraPlayerStart::StartPointTags` 中的队伍标记过滤出本队基地点位，再在其中选择未被占用者。
+ShooterCore 已有的 `UTDM_PlayerSpawningManagmentComponent` 实现的是"离敌人最远"，与"回本队基地"冲突。设计为在 `ShooterCoreRuntime` 新建出生点组件，覆写 `OnChoosePlayerStart`：按 `ALyraPlayerStart::StartPointTags` 中的队伍标记过滤出本队基地点位，再在其中选择未被占用者。
 
-不修改复制来的 TDM 组件，而是新建并在 Palworld 的 Experience 中挂载不同组件——保持两种选点策略并存，便于对照调试。
+不修改已有的 TDM 组件，而是新建并在 ShooterCore 的搜打撤 Experience 中挂载不同组件——保持两种选点策略并存，便于对照调试。
 
 玩家无队伍时的处理与 TDM 组件一致：返回 nullptr 交由上游回退随机未占用点，避免早期登录阶段（队伍尚未分配）无法出生。
 
@@ -187,7 +189,7 @@ TS 模块按 GameFeature 组织，通过既有的 GameFeature 生命周期观察
 - [World Partition 服务器端流送配置不当，导致远处玩家所在区域未加载] → 传送验收明确覆盖"A 在副本、B 在基地"的双客户端场景，检查双方 Actor 可见性与位置复制。
 - [TypeScript Blueprint 在 Cook 或 Dedicated Server 上加载不稳定] → 先做小型 Phase 探针；失败则回退无逻辑 Blueprint 壳，规则留在 TS，规格行为不变。
 - [`WaitDebugger` 配置化后开发者本机调试流程改变] → 保留显式开启开关并在文档记录，默认关闭只影响无人值守启动。
-- [修改 `LyraGame` 增加未来上游合并成本] → 改动限定为四项缺陷修复，不含任何玩法规则；玩法 C++ 全部在 `PalworldCoreRuntime`。
+- [修改 `LyraGame` 增加未来上游合并成本] → 改动限定为四项缺陷修复，不含任何玩法规则；玩法 C++ 全部在 `ShooterCoreRuntime`。
 - [脚本产物未进入打包，Shipping 下玩法缺失] → Cook/Stage 后检查 Stage 目录中 Palworld 脚本产物存在，作为独立验收项。
 
 ## Migration Plan

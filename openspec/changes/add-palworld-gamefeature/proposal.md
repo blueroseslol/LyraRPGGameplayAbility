@@ -40,7 +40,7 @@
 - 死亡与复活：背包物品掉落为可拾取尸包，装备槽物品保留；复活点按队伍基地过滤。
 - 交互：按 F 拾取物品与触发机关；机关使用 `FInteractionOption.TargetAbilitySystem` 在交互物自身 ASC 上执行能力。
 - 装备槽与属性：新增按 GameplayTag 寻址的装备槽组件（头/身/腿/饰品），装备时施加 GameplayEffect 增减属性、卸下时移除。新增血量以外的攻击、防御属性。
-- 伤害公式：新增 `UPalDamageExecution` 承载攻防计算，不修改 `ULyraDamageExecution`，避免破坏原 Shooter 三件套。
+- 伤害公式：新增 `UPalWorldAttackDefenseExecution` 承载攻防计算，不修改 `ULyraDamageExecution`，避免破坏原 Shooter 三件套。
 - UI：按 I 打开背包与装备栏；沿用 UIExtension 数据驱动装配，不修改 `ALyraHUD`。
 
 **明确不在范围内**
@@ -79,7 +79,7 @@
 
 - `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp`：实现 `AddEntry(ItemInstance*)`。
 - `Source/LyraGame/System/LyraGameInstance.cpp`：`WaitDebugger()` 配置化。
-- `Plugins/GameFeatures/PalworldCore/Source/PalworldCoreRuntime/`：装备槽组件、装备 Fragment、AttributeSet、DamageExecution、传送点/传送接口、掉落组件、出生点选择组件。新增玩法类集中在此模块，不写入 `LyraGame`。
+- `Plugins/GameFeatures/ShooterCore/Source/ShooterCoreRuntime/`：装备槽组件、装备 Fragment、AttributeSet、DamageExecution、传送点/传送接口、掉落组件、出生点选择组件。新增玩法类集中在此模块，不写入 `LyraGame`。
 - 若传送与队伍写入需要新的 Authority 安全接口，按现有 `ULyraTeamStatics` 的窄接口模式扩展，函数体内二次校验 Authority 并返回可诊断枚举；不新增按字符串调用的通用 RPC。
 
 **TypeScript / PuerTS**

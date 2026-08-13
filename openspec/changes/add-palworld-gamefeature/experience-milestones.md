@@ -25,7 +25,7 @@
 | 资产 | `LyraGameFeatureData` 实例（`ShooterCore/Content/GameFeatureData/ShooterCore`），`Actions` 挂 TravelSetup；Palworld 的 `ExperienceDefinition` 在 `GameFeaturesToEnable` 填 `ShooterCore` |
 | 验收 | 停用 Experience 后 ShooterGame 仍可启动；激活后 Actions 逐一执行；PuerTS 可驱动开/关 |
 
-**阻塞待办**：`UGameFeatureAction_TravelSetup` 形态——传送点是「地图布置」还是「Action 按配置刷出」。
+**阻塞待办（已由 `B_Teleport` 取代）**：~~`UGameFeatureAction_TravelSetup` 形态——传送点是「地图布置」还是「Action 按配置刷出」~~；区域传送改复用 Lyra 现成 `B_Teleport`，接入由用户处理。
 
 ### M3 — PuerTS 职责重定位
 
@@ -35,14 +35,14 @@
 | C++ | 不新增（控制已归 Experience 系统） |
 | 验收 | `npm run typecheck` + contract tests 仍绿；TS 模块无 UE 生命周期状态残留 |
 
-### M4 — 区域传送（5.1–5.7，已大半完成）
+### M4 — 区域传送（5.1–5.7，二次修订：复用 Lyra 现成传送门）
 
 | 层 | 内容 |
 |---|---|
-| C++ | `ALyraTravelDestination`/`ULyraTravelStatics`/`ELyraTravelResult`/`ULyraZoneStateComponent`/`ALyraTravelInteractionPoint`（✅ 已实现，未提交） |
-| PuerTS | `TravelCoordinator`/`TravelGateway`/`TravelTypes`（✅ 已实现，未提交，纯逻辑模块） |
-| 资产 | `GA_Travel` 能力、交互点 `InteractionAbilityToGrant` 配置、地图布置传送点 |
-| 验收 | 编辑器 PIE 单客户端「按 F 传送」；双客户端 DS 区域隔离（A 副本、B 基地） |
+| C++ | ~~`ALyraTravelDestination`/`ULyraTravelStatics`/`ELyraTravelResult`/`ULyraZoneStateComponent`/`ALyraTravelInteractionPoint`~~（已删除）→ 复用 Lyra 现成 `B_Teleport`（`ShooterCore/Content/Blueprint/B_Teleport`），**接入由用户处理** |
+| PuerTS | ~~`TravelCoordinator`/`TravelGateway`/`TravelTypes`~~（已删除，纯逻辑模块）→ 是否仍需 TS 编排取决于 `B_Teleport` 接入方式 |
+| 资产 | `B_Teleport` 布点（两队基地 + 可探索区域传送点） |
+| 验收 | 编辑器 PIE 单客户端「触发传送」；双客户端 DS 区域隔离（A 副本、B 基地） |
 
 ### M5 — 局内 Phase 与全局局时（6.1–6.12）
 
@@ -57,7 +57,7 @@
 
 | 层 | 内容 |
 |---|---|
-| C++ | 按 Tag 寻址的装备槽组件（挂 PlayerState，`FFastArraySerializer` 复制）；`UPalAttributeSet`（攻/防）；`UPalDamageExecution`（攻防 + 队伍许可 + 距离/材质衰减，`Max(…,0)` 下限）；装备 Fragment |
+| C++ | 按 Tag 寻址的装备槽组件（挂 PlayerState，`FFastArraySerializer` 复制）；`UPalWorldAttackDefenseSet`（攻/防）；`UPalWorldAttackDefenseExecution`（攻防 + 队伍许可 + 距离/材质衰减，`Max(…,0)` 下限）；装备 Fragment |
 | PuerTS | 装备/卸下意图提交 + 前置校验（快速失败，最终写入走 C++ Authority） |
 | 资产 | 装备槽 ItemDefinition、GE 资产（指向新 Execution） |
 | 验收 | 装备属性增减正确；原 Shooter 伤害不变；重生三次属性不累积 |
@@ -82,9 +82,9 @@
 
 ### M9 — 最终交付（10.1–10.9）
 
-打包（脚本产物进 Stage/NonUFS）、原 Shooter 三件套回归、停用 Palworld Feature 可整体回退、文档与 openspec 归档。
+打包（脚本产物进 Stage/NonUFS）、原 Shooter 三件套回归、停用搜打撤 Feature 可整体回退、文档与 openspec 归档。
 
 ## 待拍板
 
-1. `UGameFeatureAction_TravelSetup` 形态：地图布置 vs Action 刷出（决定 M2 阻塞项）。
+1. ~~`UGameFeatureAction_TravelSetup` 形态：地图布置 vs Action 刷出~~（已由「复用 `B_Teleport`」取代，接入由用户处理，不再阻塞）。
 2. 是否把本计划继续拆到任务级（对标 `tasks.md`）。
