@@ -33,6 +33,63 @@ AActor* UTDM_PlayerSpawningManagmentComponent::OnChoosePlayerStart(AController* 
 		return nullptr;
 	}
 
+	auto HasTeamSpawnTag = [](ALyraPlayerStart* PlayerStart, int32 DesiredTeamId)
+	{
+		if (!PlayerStart)
+		{
+			return false;
+		}
+
+		for (const FGameplayTag& StartTag : PlayerStart->GetGameplayTags())
+		{
+			TArray<FString> TagSegments;
+			StartTag.ToString().ParseIntoArray(TagSegments, TEXT("."), true);
+
+			if ((TagSegments.Num() == 3)
+				&& TagSegments[0].Equals(TEXT("Spawn"), ESearchCase::IgnoreCase)
+				&& TagSegments[1].Equals(TEXT("Team"), ESearchCase::IgnoreCase))
+			{
+				if (TagSegments[2].IsNumeric() && (FCString::Atoi(*TagSegments[2]) == DesiredTeamId))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
+	// Spawn.Team.1 is the opt-in marker so maps without team tags keep their original behavior.
+	const bool bUsesTeamSpecificStarts = PlayerStarts.ContainsByPredicate(
+		[&HasTeamSpawnTag](ALyraPlayerStart* PlayerStart)
+		{
+			return HasTeamSpawnTag(PlayerStart, 1);
+		});
+
+	TArray<ALyraPlayerStart*> CandidatePlayerStarts;
+	if (bUsesTeamSpecificStarts)
+	{
+		for (ALyraPlayerStart* PlayerStart : PlayerStarts)
+		{
+			if (HasTeamSpawnTag(PlayerStart, PlayerTeamId))
+			{
+				CandidatePlayerStarts.Add(PlayerStart);
+			}
+		}
+
+		if (CandidatePlayerStarts.IsEmpty())
+		{
+			UE_LOG(LogTemp, Warning,
+				TEXT("No LyraPlayerStart tagged Spawn.Team.%d was found; falling back to all player starts."),
+				PlayerTeamId);
+			CandidatePlayerStarts = PlayerStarts;
+		}
+	}
+	else
+	{
+		CandidatePlayerStarts = PlayerStarts;
+	}
+
 	ALyraGameState* GameState = GetGameStateChecked<ALyraGameState>();
 
 	ALyraPlayerStart* BestPlayerStart = nullptr;
@@ -53,7 +110,7 @@ AActor* UTDM_PlayerSpawningManagmentComponent::OnChoosePlayerStart(AController* 
 		// If the other player isn't on the same team, lets find the furthest spawn from them.
 		if (TeamId != PlayerTeamId)
 		{
-			for (ALyraPlayerStart* PlayerStart : PlayerStarts)
+			for (ALyraPlayerStart* PlayerStart : CandidatePlayerStarts)
 			{
 				if (APawn* Pawn = PS->GetPawn())
 				{
@@ -85,7 +142,12 @@ AActor* UTDM_PlayerSpawningManagmentComponent::OnChoosePlayerStart(AController* 
 		return BestPlayerStart;
 	}
 
-	return FallbackPlayerStart;
+	if (FallbackPlayerStart)
+	{
+		return FallbackPlayerStart;
+	}
+
+	return GetFirstRandomUnoccupiedPlayerStart(Player, CandidatePlayerStarts);
 }
 
 void UTDM_PlayerSpawningManagmentComponent::OnFinishRestartPlayer(AController* Player, const FRotator& StartRotation)
