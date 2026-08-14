@@ -39,6 +39,7 @@
 - PVP：沿用 Lyra 分队对抗语义（同队零伤害由 `ULyraTeamSubsystem::CanCauseDamage` 提供），主基地不设安全区。
 - 死亡与复活：背包物品掉落为可拾取尸包，装备槽物品保留；复活点按队伍基地过滤。
 - 交互：按 F 拾取物品与触发机关；机关使用 `FInteractionOption.TargetAbilitySystem` 在交互物自身 ASC 上执行能力。
+- 主动丢弃：玩家可从背包界面把物品丢到角色附近的地面，并可再次拾取；客户端只提交意图，`ULyraInventoryManagerComponent` 的 owning-client RPC 在服务器校验物品归属、生成世界拾取物并事务性移除背包条目，物品定义与 StatTags 在往返过程中保持。
 - 装备槽与属性：新增按 GameplayTag 寻址的装备槽组件（头/身/腿/饰品），装备时施加 GameplayEffect 增减属性、卸下时移除。新增血量以外的攻击、防御属性。
 - 伤害公式：新增 `UPalWorldAttackDefenseExecution` 承载攻防计算，不修改 `ULyraDamageExecution`，避免破坏原 Shooter 三件套。
 - UI：按 I 打开背包与装备栏；沿用 UIExtension 数据驱动装配，不修改 `ALyraHUD`。
@@ -77,15 +78,17 @@
 
 **C++**
 
-- `Source/LyraGame/Inventory/LyraInventoryManagerComponent.cpp`：实现 `AddEntry(ItemInstance*)`。
+- `Source/LyraGame/Inventory/LyraInventoryManagerComponent.*`：实现 `AddEntry(ItemInstance*)`，并提供通用、服务器权威的主动丢弃 RPC；跨 Actor 接收物品实例时复制到当前背包 Owner Actor，保证可复制子对象的 Outer 合法。
+- `Source/LyraGame/Inventory/`：新增通用世界拾取 Actor/掉落结果契约；ShooterCore/ShooterExplorer 只配置具体视觉、碰撞与交互资产，`LyraGame` 不反向依赖 GameFeature 模块。
 - `Source/LyraGame/System/LyraGameInstance.cpp`：`WaitDebugger()` 配置化。
-- `Plugins/GameFeatures/ShooterCore/Source/ShooterCoreRuntime/`：装备槽组件、装备 Fragment、AttributeSet、DamageExecution、传送点/传送接口、掉落组件、出生点选择组件。新增玩法类集中在此模块，不写入 `LyraGame`。
+- `Plugins/GameFeatures/ShooterCore/Source/ShooterCoreRuntime/`：装备槽组件、装备 Fragment、AttributeSet、DamageExecution、传送点/传送接口、死亡掉落组件、出生点选择组件。除前述可跨 Experience 复用的通用 Inventory 主动丢弃原语外，新增玩法类集中在此模块，不写入 `LyraGame`。
 - 若传送与队伍写入需要新的 Authority 安全接口，按现有 `ULyraTeamStatics` 的窄接口模式扩展，函数体内二次校验 Authority 并返回可诊断枚举；不新增按字符串调用的通用 RPC。
 
 **TypeScript / PuerTS**
 
 - `TypeScript/Main.ts`（保留用户现有修改，只增加最小 bootstrap）、新增 GameFeature 脚本模块目录（`TypeScript/GameFeatures/`）、根 `tsconfig.json` 与项目根 `package.json`（原生 PuerTS 布局，EasyEditorPlugin 已移除）。
 - TS 承担范围：Phase 编排、局时与撤离流程、传送判定编排、装备操作意图提交、UI Presenter。
+- Inventory 的 PuerTS 接线直接从 `TypeScript/Main.ts` 启动 Presenter，并用 `blueprint.mixin` 扩展既有 `W_InventoryTile` 拖放事件；GameFeature 激活/停用继续由 UE 原生 `UGameFeaturesSubsystem` 与 Lyra Experience 管理，不恢复已删除的 TypeScript GameFeature 生命周期状态机。
 - TS 不承担范围：`FFastArraySerializer` 复制结构、`UPROPERTY` 反射、AttributeSet、GameplayEffect Execution、子对象复制注册——这些必须是 C++。
 
 **资产（需 Unreal Editor）**

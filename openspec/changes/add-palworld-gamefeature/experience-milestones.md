@@ -9,7 +9,7 @@
   `ULyraExperienceDefinition`（资产）→ `ULyraExperienceManagerComponent`（GameState 组件）→ `UGameFeaturesSubsystem.LoadAndActivateGameFeaturePlugin` → 插件 `UGameFeatureData.Actions` → 各 `UGameFeatureAction` 子类干活。
 - **PuerTS 职责重定位**：TS 不再重造生命周期，只做两类事——① 经 `ULyraGameFeatureStatics` 驱动「何时激活哪个 GameFeature」；② 业务编排（Phase 流程、撤离分流、装备意图、UI Presenter）。
 - **C++/TS 判定口诀**（沿用 design.md 决策 8）：`FFastArraySerializer`/`UPROPERTY` 反射/`AttributeSet`/`Execution`/可复制子对象/引擎虚函数/Authority 校验 → **C++**；其余编排/UI/意图提交 → **TS**。
-- **落点**：玩法 C++ 全部在 `ShooterCoreRuntime`（GameFeature 模块）；`LyraGame` 只保留已完成的四项缺陷修复，不新增玩法规则。
+- **落点**：玩法 C++ 全部在 `ShooterCoreRuntime`（GameFeature 模块）；`LyraGame` 保留四项缺陷修复，并承载一个不含玩法规则/视觉资产、可跨 Experience 复用的通用 Inventory 主动丢弃原语。
 - **关键事实**：UE 5.7 的 `UGameFeaturesSubsystem` 激活/停用方法**不是 UFUNCTION**（纯 C++ `UE_API`），PuerTS/蓝图无法直接调用，必须经 `ULyraGameFeatureStatics` 薄包装；也不要继承 `UGameFeaturesSubsystem` 再补 UFUNCTION（会与基类单例数据分叉，见 `GameFeaturesSubsystem.h:445` 硬编码 `Get()`）。
 
 ## 里程碑划分（M2–M9）

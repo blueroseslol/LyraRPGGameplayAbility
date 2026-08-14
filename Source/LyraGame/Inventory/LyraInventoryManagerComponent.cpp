@@ -4,7 +4,11 @@
 
 #include "Engine/ActorChannel.h"
 #include "Engine/World.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "GameFramework/Pawn.h"
+#include "Kismet/GameplayStatics.h"
+#include "LyraInventoryPickup.h"
 #include "LyraInventoryItemDefinition.h"
 #include "LyraInventoryItemInstance.h"
 #include "NativeGameplayTags.h"
@@ -160,6 +164,7 @@ ULyraInventoryManagerComponent::ULyraInventoryManagerComponent(const FObjectInit
 	, InventoryList(this)
 {
 	SetIsReplicatedByDefault(true);
+	DropPickupClass = ALyraInventoryPickup::StaticClass();
 }
 
 void ULyraInventoryManagerComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -192,10 +197,27 @@ ULyraInventoryItemInstance* ULyraInventoryManagerComponent::AddItemDefinition(TS
 
 void ULyraInventoryManagerComponent::AddItemInstance(ULyraInventoryItemInstance* ItemInstance)
 {
-	InventoryList.AddEntry(ItemInstance);
-	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
+	AActor* OwningActor = GetOwner();
+	if (!IsValid(ItemInstance) || !IsValid(OwningActor) || !OwningActor->HasAuthority())
 	{
-		AddReplicatedSubObject(ItemInstance);
+		return;
+	}
+
+	ULyraInventoryItemInstance* InstanceToAdd = ItemInstance;
+	if (ItemInstance->GetOuter() != OwningActor)
+	{
+		InstanceToAdd = DuplicateObject<ULyraInventoryItemInstance>(ItemInstance, OwningActor);
+	}
+
+	if (!IsValid(InstanceToAdd))
+	{
+		return;
+	}
+
+	InventoryList.AddEntry(InstanceToAdd);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
+	{
+		AddReplicatedSubObject(InstanceToAdd);
 	}
 }
 
@@ -207,6 +229,164 @@ void ULyraInventoryManagerComponent::RemoveItemInstance(ULyraInventoryItemInstan
 	{
 		RemoveReplicatedSubObject(ItemInstance);
 	}
+}
+
+ELyraInventoryDropResult ULyraInventoryManagerComponent::RequestDropItem(ULyraInventoryItemInstance* ItemInstance)
+{
+	AActor* OwningActor = GetOwner();
+	if (!IsValid(OwningActor))
+	{
+		return ELyraInventoryDropResult::InvalidOwner;
+	}
+
+	if (!IsValid(ItemInstance))
+	{
+		return ELyraInventoryDropResult::InvalidItem;
+	}
+
+	if (!ContainsItemInstance(ItemInstance))
+	{
+		return ELyraInventoryDropResult::ItemNotOwned;
+	}
+
+	if (OwningActor->HasAuthority())
+	{
+		return DropItemOnAuthority(ItemInstance);
+	}
+
+	if (!OwningActor->HasLocalNetOwner())
+	{
+		return ELyraInventoryDropResult::NotAuthority;
+	}
+
+	ServerRequestDropItem(ItemInstance);
+	return ELyraInventoryDropResult::RequestSubmitted;
+}
+
+void ULyraInventoryManagerComponent::ServerRequestDropItem_Implementation(ULyraInventoryItemInstance* ItemInstance)
+{
+	const ELyraInventoryDropResult Result = DropItemOnAuthority(ItemInstance);
+	ClientNotifyDropItemResult(ItemInstance, Result);
+	if (Result != ELyraInventoryDropResult::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory drop rejected for %s on %s (result %d)"), *GetNameSafe(ItemInstance), *GetNameSafe(GetOwner()), static_cast<int32>(Result));
+	}
+}
+
+void ULyraInventoryManagerComponent::ClientNotifyDropItemResult_Implementation(
+	ULyraInventoryItemInstance* ItemInstance,
+	ELyraInventoryDropResult Result)
+{
+	OnDropItemResult.Broadcast(ItemInstance, Result);
+}
+
+ELyraInventoryDropResult ULyraInventoryManagerComponent::DropItemOnAuthority(ULyraInventoryItemInstance* ItemInstance)
+{
+	AActor* OwningActor = GetOwner();
+	if (!IsValid(OwningActor))
+	{
+		return ELyraInventoryDropResult::InvalidOwner;
+	}
+
+	if (!OwningActor->HasAuthority())
+	{
+		return ELyraInventoryDropResult::NotAuthority;
+	}
+
+	if (!IsValid(ItemInstance))
+	{
+		return ELyraInventoryDropResult::InvalidItem;
+	}
+
+	if (!ContainsItemInstance(ItemInstance))
+	{
+		return ELyraInventoryDropResult::ItemNotOwned;
+	}
+
+	APawn* DropPawn = ResolveDropPawn();
+	if (!IsValid(DropPawn))
+	{
+		return ELyraInventoryDropResult::NoDropPawn;
+	}
+
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return ELyraInventoryDropResult::NoWorld;
+	}
+
+	if (!DropPickupClass)
+	{
+		return ELyraInventoryDropResult::PickupClassNotConfigured;
+	}
+
+	const FVector Forward = DropPawn->GetActorForwardVector().GetSafeNormal2D();
+	FVector DropLocation = DropPawn->GetActorLocation() + Forward * DropDistance;
+
+	FHitResult GroundHit;
+	FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(LyraInventoryDropGround), false, DropPawn);
+	const FVector TraceStart = DropLocation + FVector::UpVector * DropTraceHeight;
+	const FVector TraceEnd = DropLocation - FVector::UpVector * DropTraceDepth;
+	if (World->LineTraceSingleByChannel(GroundHit, TraceStart, TraceEnd, ECC_Visibility, TraceParams))
+	{
+		DropLocation = GroundHit.ImpactPoint + FVector::UpVector * DropGroundOffset;
+	}
+
+	const FTransform DropTransform(DropPawn->GetActorRotation(), DropLocation);
+	ALyraInventoryPickup* PickupActor = World->SpawnActorDeferred<ALyraInventoryPickup>(
+		DropPickupClass,
+		DropTransform,
+		OwningActor,
+		DropPawn,
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
+
+	if (!IsValid(PickupActor))
+	{
+		return ELyraInventoryDropResult::SpawnFailed;
+	}
+
+	if (!PickupActor->InitializeFromItem(ItemInstance))
+	{
+		PickupActor->Destroy();
+		return ELyraInventoryDropResult::SpawnFailed;
+	}
+
+	AActor* FinishedActor = UGameplayStatics::FinishSpawningActor(PickupActor, DropTransform);
+	if (!IsValid(FinishedActor))
+	{
+		return ELyraInventoryDropResult::SpawnFailed;
+	}
+
+	RemoveItemInstance(ItemInstance);
+	return ELyraInventoryDropResult::Success;
+}
+
+void ULyraInventoryManagerComponent::SetDropPickupClass(TSubclassOf<ALyraInventoryPickup> InPickupClass)
+{
+	if (AActor* OwningActor = GetOwner(); IsValid(OwningActor) && OwningActor->HasAuthority())
+	{
+		DropPickupClass = InPickupClass;
+	}
+}
+
+APawn* ULyraInventoryManagerComponent::ResolveDropPawn() const
+{
+	if (APawn* OwningPawn = Cast<APawn>(GetOwner()))
+	{
+		return OwningPawn;
+	}
+
+	if (const AController* OwningController = Cast<AController>(GetOwner()))
+	{
+		return OwningController->GetPawn();
+	}
+
+	return nullptr;
+}
+
+bool ULyraInventoryManagerComponent::ContainsItemInstance(ULyraInventoryItemInstance* ItemInstance) const
+{
+	return InventoryList.GetAllItems().Contains(ItemInstance);
 }
 
 TArray<ULyraInventoryItemInstance*> ULyraInventoryManagerComponent::GetAllItems() const
@@ -329,5 +509,3 @@ bool ULyraInventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel,
 // public:
 // 	virtual bool PassesFilter(ULyraInventoryItemInstance* Instance) const { return true; }
 // };
-
-

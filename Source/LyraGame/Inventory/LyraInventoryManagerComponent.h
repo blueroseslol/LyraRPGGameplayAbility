@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "Inventory/LyraInventoryDropTypes.h"
 #include "Net/Serialization/FastArraySerializer.h"
 
 #include "LyraInventoryManagerComponent.generated.h"
@@ -12,6 +13,8 @@
 class ULyraInventoryItemDefinition;
 class ULyraInventoryItemInstance;
 class ULyraInventoryManagerComponent;
+class ALyraInventoryPickup;
+class APawn;
 class UObject;
 struct FFrame;
 struct FLyraInventoryList;
@@ -151,6 +154,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Inventory)
 	UE_API void RemoveItemInstance(ULyraInventoryItemInstance* ItemInstance);
 
+	/** Submit a drop intent. Owning clients forward it to the server; authority executes immediately. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Drop")
+	UE_API ELyraInventoryDropResult RequestDropItem(ULyraInventoryItemInstance* ItemInstance);
+
+	/** Execute the transactional server-side drop operation. */
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Inventory|Drop")
+	UE_API ELyraInventoryDropResult DropItemOnAuthority(ULyraInventoryItemInstance* ItemInstance);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Inventory|Drop")
+	UE_API void SetDropPickupClass(TSubclassOf<ALyraInventoryPickup> InPickupClass);
+
+	/** Owning-client notification for the asynchronous Server RPC result. */
+	UPROPERTY(BlueprintAssignable, Category = "Inventory|Drop")
+	FLyraInventoryDropResultDelegate OnDropItemResult;
+
 	UFUNCTION(BlueprintCallable, Category=Inventory, BlueprintPure=false)
 	UE_API TArray<ULyraInventoryItemInstance*> GetAllItems() const;
 
@@ -166,6 +184,31 @@ public:
 	//~End of UObject interface
 
 private:
+	UFUNCTION(Server, Reliable)
+	void ServerRequestDropItem(ULyraInventoryItemInstance* ItemInstance);
+
+	UFUNCTION(Client, Reliable)
+	void ClientNotifyDropItemResult(ULyraInventoryItemInstance* ItemInstance, ELyraInventoryDropResult Result);
+
+	APawn* ResolveDropPawn() const;
+
+	bool ContainsItemInstance(ULyraInventoryItemInstance* ItemInstance) const;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory|Drop")
+	TSubclassOf<ALyraInventoryPickup> DropPickupClass;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory|Drop", meta = (ClampMin = "0.0", Units = "cm"))
+	float DropDistance = 150.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory|Drop", meta = (ClampMin = "0.0", Units = "cm"))
+	float DropTraceHeight = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory|Drop", meta = (ClampMin = "0.0", Units = "cm"))
+	float DropTraceDepth = 300.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory|Drop", meta = (ClampMin = "0.0", Units = "cm"))
+	float DropGroundOffset = 20.0f;
+
 	UPROPERTY(Replicated)
 	FLyraInventoryList InventoryList;
 };

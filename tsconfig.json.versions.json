@@ -1,85 +1,11 @@
 {
     "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/Main.ts": {
-        "version": "e90089ddb269e7c20c0448c7c9dc255a",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Bootstrap.ts": {
-        "version": "b11e9338b2616f652002fade21ac8cc2",
-        "processed": true
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Lifecycle.ts": {
-        "version": "e9312b0fa69465057db4d22c8b8bddbc",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/UeDeclarations.d.ts": {
-        "version": "c830e3e773df8662a30a1778cb6fdac7",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/DisposableScope.ts": {
-        "version": "5e089e41e5e5f0b74090717f336fa395",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/EventScope.ts": {
-        "version": "cf487391cebe5e71c5042203fe606d28",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/TimerScope.ts": {
-        "version": "32d8ba4cbfc8d8282acf635d6a7c884b",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Scopes/WeakRef.ts": {
-        "version": "8aec540ba3dc60bc4de21f6717649b8d",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/ShooterFeature.ts": {
-        "version": "b52b0e8be648d182f11e1dfa147bc5bf",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/ServiceRegistry.ts": {
-        "version": "722198559e48da1fe441a132a8dfca3d",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelCoordinator.ts": {
-        "version": "0ccf500c93812bb742aa2044b23a6e82",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelGateway.ts": {
-        "version": "5dbf82c826122e823bddb9fd5aacda85",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Shooter/Services/TravelTypes.ts": {
-        "version": "33c94dc3646e4626456973d8fb0e9567",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/ContractTests.ts": {
-        "version": "df2ce147a8de40b174d344477a6b2ee2",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/ShooterContractTests.ts": {
-        "version": "2718805c8ae217fe2827753a219dae48",
+        "version": "b87e3dd152ef40bd139b15bc93059340",
         "processed": true,
         "isBP": false
     },
     "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/TestKit.ts": {
         "version": "28bfed2d47e3882f3c93cf642b32a84a",
-        "processed": true,
-        "isBP": false
-    },
-    "D:/MatrixTA/LyraRPGGameplayAbility/TypeScript/GameFeatures/Tests/TravelCoordinatorTests.ts": {
-        "version": "b4fb2ee539719cc3611f233c9299cf04",
         "processed": true,
         "isBP": false
     },

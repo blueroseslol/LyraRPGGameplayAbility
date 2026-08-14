@@ -33,7 +33,7 @@
 - 每个 `ULyraGameInstance` 创建一个 `FJsEnv`（`Source/LyraGame/System/LyraGameInstance.cpp:93`），模块根为 `Content/JavaScript`。
 - 同一位置调用 `GameScript->WaitDebugger()`，在 Init 阶段同步阻塞等待调试器。
 - `Config/DefaultPuerts.ini` 曾注册不存在的 `Developer/TypeScript/tsconfig.json`（EasyEditorPlugin 迭代加入）；2026-08-12 已恢复原生设置，回落默认 `tsconfig.json`（项目根，编译 `TypeScript/Main.ts`）。
-- `TypeScript/Main.ts` 已注释掉 `GameplayRuntime` 实例化，但 `Content/JavaScript/Main.js` 仍是含实例化的旧版本。
+- `TypeScript/Main.ts` 是当前 PuerTS 运行时入口。提交 `2a39a4b6` 已删除此前的 TypeScript GameFeature 生命周期、ServiceRegistry 与 Bootstrap，GameFeature 激活/停用回归 UE 原生 `UGameFeaturesSubsystem` / Lyra Experience；后续 Inventory Presenter 从 `Main.ts` 做最小接线，不恢复该状态机。
 - `Typing/ue/ue.d.ts` 已覆盖 `LyraInventoryManagerComponent`、`LyraGamePhaseSubsystem`、`LyraTeamSubsystem`、`CommonSessionSubsystem` 等 Lyra 类型。
 
 **地图现状**
@@ -67,11 +67,11 @@
 
 新增的 Palworld 玩法 C++（装备槽、属性、伤害 Execution、传送、掉落、出生点）全部落在 `PalworldCoreRuntime`，而非 `LyraGame`。理由：`LyraGame` 是上游 Lyra 代码，改动越少未来合并成本越低；且玩法类放在 GameFeature 模块内可随插件停用而整体失效，符合 `palworld-gamefeature-shells` 的停用释放要求。
 
-`LyraGame` 只接受四项缺陷修复（见决策 2），不接受任何 Palworld 玩法规则。
+`LyraGame` 只接受四项缺陷修复与一个通用 Inventory 主动丢弃原语（见决策 2），不接受任何 ShooterGame/Palworld 玩法规则或视觉资产。
 
 替代方案是合并成单个 Palworld 插件。该方案减少一次资产重定向，但会失去"地图与玩法分离迭代"的边界，且与用户已确认的三插件结构不符，故不采用。
 
-### 2. LyraGame 的改动限定为四项缺陷修复
+### 2. LyraGame 的改动限定为四项缺陷修复与一个通用 Inventory 原语
 
 | 位置 | 改动 | 为何必须在 LyraGame |
 |---|---|---|
@@ -79,8 +79,9 @@
 | `System/LyraGameInstance.cpp:93` | `WaitDebugger()` 配置化 | FJsEnv 的创建点在此，无法从 GameFeature 覆盖 |
 | `Config/DefaultPuerts.ini` | 修正 tsconfig 注册路径 | 项目级配置 |
 | `TypeScript/Main.ts` + 产物 | 源码与产物同步 | 项目级脚本入口 |
+| `Inventory/LyraInventoryManagerComponent.*` + 通用世界拾取 Actor | owning-client 主动丢弃 RPC、服务器校验、事务性生成与跨 Actor 实例复制 | 这是背包所有权与可复制子对象 Outer 的通用不变量；放在 ShooterCore 会造成 `LyraGame` 反向依赖 GameFeature，且其他 Experience 无法复用 |
 
-前两项是行为缺陷（一个使规格无法满足，一个使 Dedicated Server 无法启动），不是功能扩展。`AddEntry` 的实现应与既有 `AddEntry(ItemDef, StackCount)` 保持一致的子对象注册与消息广播语义。
+前两项是行为缺陷（一个使规格无法满足，一个使 Dedicated Server 无法启动），不是功能扩展。`AddEntry` 的实现应与既有 `AddEntry(ItemDef, StackCount)` 保持一致的子对象注册与消息广播语义。主动丢弃是唯一允许进入 `LyraGame` 的通用功能扩展，只包含 Inventory 所有权、复制与 Authority 边界，不包含 ShooterGame 玩法规则或视觉资产。
 
 `WaitDebugger` 采用配置开关而非直接删除，保留开发者显式开启的能力，符合 `lyra-baseline-fixes` 的两个场景。
 
@@ -168,8 +169,9 @@ ShooterCore 已有的 `UTDM_PlayerSpawningManagmentComponent` 实现的是"离�
 - 传送入口的业务判定
 - 装备/卸下的意图提交与前置校验
 - UI Presenter 与 ViewState 生成
+- 背包拖放意图判定、不可变 Inventory ViewState 与丢弃请求编排
 
-TS 模块按 GameFeature 组织，通过既有的 GameFeature 生命周期观察机制激活与释放，每个模块持有可集中释放的作用域以清理委托、计时器与弱 World 引用。多 GameInstance（PIE 多实例）下各 VM 独立，不共享脚本实例或 UObject 引用。
+PuerTS 玩法服务从 `TypeScript/Main.ts` 做最小启动；GameFeature 激活与停用继续由 UE 原生 `UGameFeaturesSubsystem` / Lyra Experience 管理，不恢复已删除的 TypeScript 生命周期观察器、ServiceRegistry 或 Bootstrap。Inventory Presenter 只持有可集中释放的 GameplayMessage 监听与 mixin 接线；多 GameInstance（PIE 多实例）下各 VM 独立，不共享脚本实例或 UObject 引用。
 
 ### 9. UI 沿用数据驱动装配，不修改 ALyraHUD
 
@@ -178,6 +180,16 @@ TS 模块按 GameFeature 组织，通过既有的 GameFeature 生命周期观察
 已知约束：`W_QuickBar` / `W_QuickBarSlot` 是纯蓝图，无 C++ 基类可继承。装备栏 Widget 需要新建逻辑基类（C++ 或 TypeScript Presenter）而非继承 QuickBar 的实现。
 
 规格要求"装备操作被服务器拒绝时界面回到权威状态"。设计上界面不做乐观更新——提交意图后等待复制回传再刷新，使拒绝路径无需额外回滚逻辑。
+
+### 10. 主动丢弃由 Inventory Manager 持有 RPC，PuerTS 负责 UI 意图
+
+`ULyraInventoryManagerComponent` 在现有 Lyra Inventory Experience 中挂载于 owning `PlayerController`，因此它本身就是客户端拥有者 RPC 的最窄落点，无需再新增一个 `ULyraInventoryDropComponent`。公开入口分为本地 `RequestDropItem` 与 Server RPC：客户端仅传递已复制的 `ULyraInventoryItemInstance`，服务器重新从组件背包中校验实例归属，计算角色前方的安全生成位置，成功生成世界拾取 Actor 后才移除原条目。生成失败时背包保持不变；重复请求在第一次移除后因归属校验失败，不会生成第二份物品。
+
+世界拾取 Actor 与掉落结果枚举放在 `LyraGame/Inventory`，只承载 `FInventoryPickup` 和通用交互契约。具体网格、碰撞、模型与交互能力由 ShooterExplorer 的 Blueprint 子类配置，避免 `LyraGame` 反向依赖 ShooterCore/ShooterExplorer。
+
+物品从一个 Actor Outer 跨到另一个背包时，不直接把原 UObject 注册给新的 Owner Actor。`AddItemInstance` 在 Outer 与目标 Owner 不同时复制实例到目标 Actor，依靠 UObject 属性复制保留 ItemDef 与 StatTags；同 Outer 的既有调用保持原实例指针，兼容 M1 测试。
+
+PuerTS 不承担 RPC 安全边界。`TypeScript/Main.ts` 只注册 Inventory Presenter 与 `W_InventoryTile` mixin：当一次条目拖放在无有效 UI 目标处结束时，Presenter 调用 `RequestDropItem`；ViewState 不立即删除该条目，继续等待 `Lyra.Inventory.Message.StackChanged` 的复制回传。GameFeature 生命周期仍由 UE 原生子系统管理。
 
 ## Risks / Trade-offs
 
@@ -189,7 +201,8 @@ TS 模块按 GameFeature 组织，通过既有的 GameFeature 生命周期观察
 - [World Partition 服务器端流送配置不当，导致远处玩家所在区域未加载] → 传送验收明确覆盖"A 在副本、B 在基地"的双客户端场景，检查双方 Actor 可见性与位置复制。
 - [TypeScript Blueprint 在 Cook 或 Dedicated Server 上加载不稳定] → 先做小型 Phase 探针；失败则回退无逻辑 Blueprint 壳，规则留在 TS，规格行为不变。
 - [`WaitDebugger` 配置化后开发者本机调试流程改变] → 保留显式开启开关并在文档记录，默认关闭只影响无人值守启动。
-- [修改 `LyraGame` 增加未来上游合并成本] → 改动限定为四项缺陷修复，不含任何玩法规则；玩法 C++ 全部在 `ShooterCoreRuntime`。
+- [修改 `LyraGame` 增加未来上游合并成本] → 改动限定为四项缺陷修复与一个不含玩法规则/视觉资产的通用 Inventory 主动丢弃原语；其余玩法 C++ 全部在 `ShooterCoreRuntime`。
+- [主动丢弃复制或并发处理不当导致复制物品] → 服务器先校验背包归属，世界 Actor 成功完成生成后再移除条目；跨 Outer 复制实例；Automation 与双客户端验收覆盖重复请求和重新拾取。
 - [脚本产物未进入打包，Shipping 下玩法缺失] → Cook/Stage 后检查 Stage 目录中 Palworld 脚本产物存在，作为独立验收项。
 
 ## Migration Plan

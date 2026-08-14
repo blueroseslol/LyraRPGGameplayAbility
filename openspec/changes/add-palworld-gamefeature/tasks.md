@@ -123,6 +123,12 @@
 - [ ] 9.12 验收界面开关幂等：连续两次开关背包不产生重复界面实例或重复订阅；验证：PIE，对应 `inventory-equipment-ui` 的开关场景。
 - [ ] 9.13 验收 Listen Server 本地界面绑定 Owning Local Player，远端客户端各自展示自身复制状态；验证：Listen Server + 1 远端客户端。
 - [ ] 9.14 验收局时展示：计时模式展示与服务器一致的剩余局时，自由模式不展示倒计时元素；验证：两种 Experience 各启动一次，需要 Unreal Editor。
+- [ ] 9.15 在 `LyraGame/Inventory` 新增通用世界拾取 Actor 与可诊断丢弃结果，并在 `ULyraInventoryManagerComponent` 实现 `RequestDropItem` + owning-client Server RPC：服务器二次校验物品归属与 Authority，成功生成后再移除背包条目，失败时保持背包不变；验证：编译通过 + `LyraGame.Inventory.DropItem` Automation 覆盖成功、非归属、生成失败与重复请求。**（2026-08-13 已实现并通过 UHT、三个受影响源码单元及生成代码单元的 MSVC 编译；完整 UBT/Automation 因当前 Editor Live Coding 会话占用而未验证，故暂不勾选。）**
+- [ ] 9.16 加固 `AddItemInstance` 的跨 Actor Outer 路径：目标背包 Owner 与传入实例 Outer 不同时复制实例到目标 Actor，并保持 ItemDef/StatTags；同 Outer 路径保持原实例；验证：扩展 `LyraGame.Inventory.AddItemInstance` Automation。**（2026-08-13 已实现跨 Outer 复制与 Automation 用例，受影响源码单元编译通过；完整 Automation 因当前 Editor Live Coding 会话占用而未运行，故暂不勾选。）**
+- [x] 9.17 在 `TypeScript/Inventory/` 实现不可变 ViewState、Presenter、UE Gateway 与 `W_InventoryTile` 的 `blueprint.mixin` 拖放接线；丢弃请求不做乐观删除，等待 `Lyra.Inventory.Message.StackChanged` 后刷新；`TypeScript/Main.ts` 只增加一次最小 bootstrap，不恢复已删除的 TS GameFeature 生命周期；验证：`npm run typecheck` + contract tests 覆盖成功回传、拒绝保持、重复 bootstrap 与重复意图。**（2026-08-13 已实施：typecheck 通过；Inventory contract tests 6/6 通过，额外覆盖异步服务器拒绝后可重试。）**
+- [ ] 9.18 在 ShooterExplorer 配置通用世界拾取 Actor 的 Blueprint 子类（碰撞、视觉、`GA_Interaction_Collect`），并把允许丢弃的 Inventory Manager/Experience 指向该类；验证：需要 Unreal Editor，资产重启后引用有效。
+- [ ] 9.19 完成单客户端闭环验收：拾取世界物品 → 背包 UI 展示 → 拖出界面丢到角色附近地面 → 再次拾取；验证：PIE + Standalone，确认 ItemDef/StatTags 保持且界面只随权威复制刷新。
+- [ ] 9.20 完成双客户端 Authority 与竞争验收：客户端不能丢弃他人物品，同一物品重复请求最多生成一次，另一玩家可拾取掉落物；验证：Dedicated Server + 2 客户端。
 
 ## 10. 里程碑 M9：最终验证与交付
 

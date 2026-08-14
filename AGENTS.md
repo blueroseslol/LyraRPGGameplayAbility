@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **LyraRPGGameplayAbility** (12052 symbols, 19415 relationships, 294 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **LyraRPGGameplayAbility** (11799 symbols, 18733 relationships, 289 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -40,25 +40,5 @@ This project is indexed by GitNexus as **LyraRPGGameplayAbility** (12052 symbols
 | Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
 | Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
-| Work in the Private area (391 symbols) | `.claude/skills/generated/private/SKILL.md` |
-| Work in the GameFeatures area (138 symbols) | `.claude/skills/generated/gamefeatures/SKILL.md` |
-| Work in the Settings area (129 symbols) | `.claude/skills/generated/settings/SKILL.md` |
-| Work in the Public area (95 symbols) | `.claude/skills/generated/public/SKILL.md` |
-| Work in the Player area (91 symbols) | `.claude/skills/generated/player/SKILL.md` |
-| Work in the Character area (76 symbols) | `.claude/skills/generated/character/SKILL.md` |
-| Work in the Weapons area (58 symbols) | `.claude/skills/generated/weapons/SKILL.md` |
-| Work in the Widgets area (58 symbols) | `.claude/skills/generated/widgets/SKILL.md` |
-| Work in the CustomSettings area (55 symbols) | `.claude/skills/generated/customsettings/SKILL.md` |
-| Work in the AbilitySystem area (53 symbols) | `.claude/skills/generated/abilitysystem/SKILL.md` |
-| Work in the Teams area (43 symbols) | `.claude/skills/generated/teams/SKILL.md` |
-| Work in the IndicatorSystem area (41 symbols) | `.claude/skills/generated/indicatorsystem/SKILL.md` |
-| Work in the Utilities area (41 symbols) | `.claude/skills/generated/utilities/SKILL.md` |
-| Work in the GameModes area (41 symbols) | `.claude/skills/generated/gamemodes/SKILL.md` |
-| Work in the Cosmetics area (38 symbols) | `.claude/skills/generated/cosmetics/SKILL.md` |
-| Work in the Input area (36 symbols) | `.claude/skills/generated/input/SKILL.md` |
-| Work in the Abilities area (30 symbols) | `.claude/skills/generated/abilities/SKILL.md` |
-| Work in the System area (27 symbols) | `.claude/skills/generated/system/SKILL.md` |
-| Work in the UI area (26 symbols) | `.claude/skills/generated/ui/SKILL.md` |
-| Work in the Camera area (24 symbols) | `.claude/skills/generated/camera/SKILL.md` |
 
 <!-- gitnexus:end -->
