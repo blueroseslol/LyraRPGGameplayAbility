@@ -5,3 +5,6 @@ Platforms
 *.sln
 Saved
 Build
+.idea
+.vs
+*.slnx

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CommonGameInstance.h"
+#include "JsEnv.h"
 
 #include "LyraGameInstance.generated.h"
 
@@ -28,6 +29,9 @@ public:
 	UE_API virtual void ReceivedNetworkEncryptionToken(const FString& EncryptionToken, const FOnEncryptionKeyResponse& Delegate) override;
 	UE_API virtual void ReceivedNetworkEncryptionAck(const FOnEncryptionKeyResponse& Delegate) override;
 
+	/** Starts the Puerts JavaScript environment and loads the Main module. */
+	UE_API virtual void OnStart() override;
+
 protected:
 
 	UE_API virtual void Init() override;
@@ -37,6 +41,11 @@ protected:
 
 	/** A hard-coded encryption key used to try out the encryption code. This is NOT SECURE, do not use this technique in production! */
 	TArray<uint8> DebugTestEncryptionKey;
+
+private:
+
+	/** Puerts JavaScript runtime, created in OnStart and released in Shutdown. */
+	TSharedPtr<puerts::FJsEnv> GameScript;
 };
 
 #undef UE_API

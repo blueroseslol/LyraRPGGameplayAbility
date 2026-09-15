@@ -114,8 +114,31 @@ void ULyraGameInstance::Init()
 	}
 }
 
+void ULyraGameInstance::OnStart()
+{
+	Super::OnStart();
+
+	// Boot the Puerts JavaScript runtime. Scripts are loaded from Content/JavaScript.
+	GameScript = MakeShared<puerts::FJsEnv>(
+		std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")),
+		std::make_shared<puerts::FDefaultLogger>(),
+		8889
+	);
+
+	// Uncomment to wait for a debugger (chrome://inspect) before running the scripts.
+	// GameScript->WaitDebugger();
+
+	TArray<TPair<FString, UObject*>> Arguments;
+	Arguments.Add(TPair<FString, UObject*>(TEXT("GameInstance"), this));
+
+	GameScript->Start(TEXT("Main"), Arguments);
+}
+
 void ULyraGameInstance::Shutdown()
 {
+	// Tear the JavaScript runtime down before the engine subsystems it may reference.
+	GameScript.Reset();
+
 	if (UCommonSessionSubsystem* SessionSubsystem = GetSubsystem<UCommonSessionSubsystem>())
 	{
 		SessionSubsystem->OnPreClientTravelEvent.RemoveAll(this);
