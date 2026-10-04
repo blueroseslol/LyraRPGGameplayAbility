@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "lib": [
+      "ESNext"
+    ],
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "sourceMap": true,
+    "outDir": "Content/JavaScript",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "baseUrl": "TypeScript",
+    "paths": {
+      "react": [
+        "node_modules/@types/react"
+      ],
+      "react-umg": [
+        "../Typing/react-umg/index.d.ts"
+      ]
+    },
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "typeRoots": [
+      "Typing"
+    ],
+    "types": []
+  },
+  "include": [
+    "TypeScript/**/*.ts",
+    "TypeScript/**/*.tsx",
+    "Plugins/EasyEditorPlugin/TypeScript/Runtime/**/*.ts",
+    "Plugins/ReactUMG/TypeScript/ReactUMGTest/**/*"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "TypeScript/dist",
+    "Content/JavaScript/**"
+  ]
+}

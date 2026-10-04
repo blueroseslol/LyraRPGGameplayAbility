@@ -131,7 +131,7 @@ void ULyraGameInstance::OnStart()
 	TArray<TPair<FString, UObject*>> Arguments;
 	Arguments.Add(TPair<FString, UObject*>(TEXT("GameInstance"), this));
 
-	GameScript->Start(TEXT("Main"), Arguments);
+	GameScript->Start(TEXT("TypeScript/Main"), Arguments);
 }
 
 void ULyraGameInstance::Shutdown()

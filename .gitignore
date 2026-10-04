@@ -8,3 +8,5 @@ Build
 .idea
 .vs
 *.slnx
+Content/JavaScript/PuertsEditor/node_modules/
+ts_file_versions_info.json
