@@ -9,6 +9,8 @@ description: 指导 AI Agent 通过 Figwright 获取 Figma 节点、布局与资
 
 ## 按阶段读取
 
+- 开源库地址、必需/可选安装项和可执行脚本：[Setup](Setup.md)。
+
 - 连接、定位设计、读取节点与导出资源：[Figwright 采集](figwright-integration.md)。
 - 控件映射、布局、资源接入与验证：[实现与验证](usage-and-validation.md)。
 
@@ -30,3 +32,7 @@ description: 指导 AI Agent 通过 Figwright 获取 Figma 节点、布局与资
 - Figwright 是设计读取端，不是游戏运行依赖。转换可以直接由 Agent 编写 TSX；已有生成器或离线包工具可复用，但不是使用本技能的前提。
 - 只修改本任务涉及的代码和资源。重新生成不能覆盖手写业务；原型中的外部操作不能直接当作已授权的业务动作执行。
 - 类型通过、UE 运行、视觉阈值、人工接受、Cook/打包是不同结论。验证不了的环节明确标记，不以历史报告替代本次结果。
+
+## 减少重复操作
+
+常用操作优先调用 [scripts](scripts/) 中的 `doctor.ts`、`compile.ts`、`bridge.ts`，先用 `--help` 查看参数；首次安装或脚本报告缺项时再读 [Setup.md](Setup.md)。脚本成功后只报告摘要，失败时检查错误和相关实现，不重复生成已有采集/编译命令。仅在工程具备 DesignBridge 扩展时使用 bridge；否则走通用 Figwright MCP 与工程原有流程。

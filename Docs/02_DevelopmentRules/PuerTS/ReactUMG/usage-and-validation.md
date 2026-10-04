@@ -2,6 +2,7 @@
 
 [返回技能入口](skill.md) · [设计采集](figwright-integration.md)
 
+依赖安装和常用脚本见 [Setup.md](Setup.md)，已有脚本优先复用。
 ## 选择控件与布局
 
 | 设计关系 | 适合的 UMG 控件 | 注意事项 |
