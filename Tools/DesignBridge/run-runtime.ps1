@@ -2,7 +2,7 @@ param([Parameter(Mandatory=$true)][string]$Package, [string]$Engine = 'D:\Unreal
 $ErrorActionPreference = 'Stop'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $packageRoot = (Resolve-Path -LiteralPath $Package).Path
-& node (Join-Path $PSScriptRoot 'cli.mjs') verify-runtime --package $packageRoot
+& node (Join-Path $projectRoot 'Plugins\ReactUMG\Tools\DesignBridge\cli.mjs') verify-runtime --package $packageRoot
 if ($LASTEXITCODE -ne 0) { throw 'Package validation failed' }
 & node (Join-Path $projectRoot 'TypeScript\node_modules\typescript\lib\tsc.js') --project (Join-Path $PSScriptRoot 'tsconfig.runtime.json')
 if ($LASTEXITCODE -ne 0) { throw 'TypeScript compile failed' }

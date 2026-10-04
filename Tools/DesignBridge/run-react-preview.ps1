@@ -2,7 +2,7 @@ param([string]$Engine = 'D:\UnrealEngine\UE_5.8', [switch]$VerifyOnly)
 $ErrorActionPreference = 'Stop'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $packageRoot = Join-Path $projectRoot 'Saved\DesignBridge\genshin_cover'
-& node (Join-Path $PSScriptRoot 'cli.mjs') verify-runtime --package $packageRoot
+& node (Join-Path $projectRoot 'Plugins\ReactUMG\Tools\DesignBridge\cli.mjs') verify-runtime --package $packageRoot
 if ($LASTEXITCODE -ne 0) { throw 'Source package validation failed' }
 & node (Join-Path $projectRoot 'TypeScript\node_modules\typescript\lib\tsc.js') --project (Join-Path $PSScriptRoot 'tsconfig.runtime.json')
 if ($LASTEXITCODE -ne 0) { throw 'TypeScript compile failed' }
