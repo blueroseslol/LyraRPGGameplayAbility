@@ -1,0 +1,11 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "DesignBridge Editor",
+  "Description": "Build editable UMG assets and capture widgets from validated DesignBridge packages.",
+  "Category": "Editor",
+  "EnabledByDefault": true,
+  "CanContainContent": false,
+  "Modules": [{ "Name": "DesignBridgeEditor", "Type": "Editor", "LoadingPhase": "Default" }]
+}

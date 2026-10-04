@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><style>body{font:13px/1.5 system-ui;margin:18px;color:#172536}label{display:block;margin:10px 0}input,select,textarea,button{box-sizing:border-box;width:100%;padding:7px;border:1px solid #becad7;border-radius:5px}button{background:#175d9c;color:white;margin:12px 0;cursor:pointer}p{color:#526477}#status{white-space:pre-wrap}a{display:block;padding:10px;background:#edf5ff}#preview{max-width:100%}</style>
+<strong>导出真实设计到 Lyra</strong><p>保留节点来源与资源。原图层不会被改写；复杂容器背景会通过临时副本导出，结束后删除副本。OpenDesign 本轮不包含。</p>
+<label>Figma 文件键<input id="fileKey" value="SKV7kQXEaCXLta7EAuZYG6"></label>
+<label>目标画板 node-id<input id="nodeId" value="1:4210"></label>
+<label>设计包名称<input id="designId" value="genshin_cover"></label>
+<label>文字处理<select id="textMode"><option value="native">原生文字（导入时必须提供正确字体）</option><option value="raster">静态文字保留原样（栅格化，记录为降级）</option></select></label>
+<label>明确栅格化的静态子树 ID（可留空）<input id="rasterizeNodes" placeholder="例如 1:200, 1:300"></label>
+<button id="export">导出当前画板</button><div id="status">请选择目标文件并导出。不会上传到外部服务。</div><div id="result"></div><img id="preview">
+<script>
+let assets=[],reference,downloadURL;
+const status=document.getElementById('status'),button=document.getElementById('export');
+function encode(bytes){let data='';for(let i=0;i<bytes.length;i+=8192)data+=String.fromCharCode(...bytes.slice(i,i+8192));return btoa(data);}
+button.onclick=()=>{assets=[];reference=undefined;document.getElementById('result').textContent='';button.disabled=true;status.textContent='正在采集原始节点和图片…';const m={type:'export'};for(const k of ['fileKey','nodeId','designId','textMode','rasterizeNodes'])m[k]=document.getElementById(k).value;parent.postMessage({pluginMessage:m},'*');};
+onmessage=event=>{const m=event.data.pluginMessage;if(!m)return;if(m.type==='asset')assets.push({id:m.id,sourceNodeId:m.sourceNodeId,base64:encode(m.bytes)});else if(m.type==='reference'){reference={base64:encode(m.bytes)};document.getElementById('preview').src='data:image/png;base64,'+reference.base64;}else if(m.type==='progress')status.textContent=m.text;else if(m.type==='error'){status.textContent='导出失败：'+m.text;button.disabled=false;}else if(m.type==='complete'){if(downloadURL)URL.revokeObjectURL(downloadURL);const value={format:'designbridge-figma-export',version:1,design:m.design,source:m.source,assets,reference};downloadURL=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));const a=document.createElement('a');a.href=downloadURL;a.download=m.design.id+'.figma-export.json';a.textContent='下载设计包（'+m.design.nodes.length+' 个控件节点 / '+assets.length+' 个真实资源）';document.getElementById('result').appendChild(a);status.textContent='导出完成，请下载。原生文字仍需在 UE 导入前配置字体；静态文字模式不会宣称文字可动态编辑。';button.disabled=false;}};
+</script>
