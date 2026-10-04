@@ -24,7 +24,7 @@ node D:/MatrixTA/UnrealHarness/Tools/UnrealHarness/harness.mjs test Harness.Puer
 
 ## 失败验证
 
-在运行命令后追加下面任一参数，测试应失败且 CLI 返回 1：
+故障注入属于进程启动参数：在运行命令后追加 `--new-process`，再追加下面任一参数，测试应失败且 CLI 返回 1。普通运行默认复用同项目空闲 Editor：
 
 - `--engine-arg -HarnessScriptFailure`：库存初始数量断言错误。
 - `--engine-arg -HarnessScriptThrow`：TS 抛异常。
