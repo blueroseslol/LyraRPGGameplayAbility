@@ -39,6 +39,7 @@ public class LyraEditor : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[] {
 				"InputCore",
+				"JsEnv",
 				"Slate",
 				"SlateCore",
 				"ToolMenus",
