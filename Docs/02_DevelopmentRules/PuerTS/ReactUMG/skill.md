@@ -9,7 +9,7 @@ description: 指导 AI Agent 通过 Figwright 获取 Figma 节点、布局与资
 
 ## 按阶段读取
 
-- 开源库地址、必需/可选安装项和可执行脚本：[Setup](Setup.md)。
+- 开源库地址、必需/可选安装项和可执行脚本：[Setup](setup.md)。
 
 - 连接、定位设计、读取节点与导出资源：[Figwright 采集](figwright-integration.md)。
 - 控件映射、布局、资源接入与验证：[实现与验证](usage-and-validation.md)。
@@ -35,4 +35,6 @@ description: 指导 AI Agent 通过 Figwright 获取 Figma 节点、布局与资
 
 ## 减少重复操作
 
-常用操作优先调用 [scripts](scripts/) 中的 `doctor.ts`、`compile.ts`、`bridge.ts`，先用 `--help` 查看参数；首次安装或脚本报告缺项时再读 [Setup.md](Setup.md)。脚本成功后只报告摘要，失败时检查错误和相关实现，不重复生成已有采集/编译命令。仅在工程具备 DesignBridge 扩展时使用 bridge；否则走通用 Figwright MCP 与工程原有流程。
+脚本统一由 ReactUMG 插件维护，本技能目录仅放文档。目录职责与文件索引见 [插件说明](../../../../Plugins/ReactUMG/docs/figwright-reactumg.md)。
+
+常用操作优先调用 [插件 scripts](../../../../Plugins/ReactUMG/scripts/) 中的 `doctor.ts`、`compile.ts`、`bridge.ts`，先用 `--help` 查看参数；首次安装或脚本报告缺项时再读 [setup.md](setup.md)。脚本成功后只报告摘要，失败时检查错误和相关实现，不重复生成已有采集/编译命令。仅在工程具备 DesignBridge 扩展时使用 bridge；否则走通用 Figwright MCP 与工程原有流程。

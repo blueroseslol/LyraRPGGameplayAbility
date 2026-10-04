@@ -2,7 +2,7 @@
 
 [返回技能入口](skill.md) · [实现与验证](usage-and-validation.md)
 
-依赖安装和常用脚本见 [Setup.md](Setup.md)，已有脚本优先复用。
+依赖安装和常用脚本见 [setup.md](setup.md)；脚本统一位于插件 `scripts`，转换工具位于 `scripts/Figwright`。
 ## 连接与目标核对
 
 1. 先检查当前 Agent 是否已有 Figwright MCP、CLI 或项目封装工具，读取其实际 schema/help。不要混用其他 Figma 服务的同名接口，也不要硬编码版本、端口、session 或安装路径。

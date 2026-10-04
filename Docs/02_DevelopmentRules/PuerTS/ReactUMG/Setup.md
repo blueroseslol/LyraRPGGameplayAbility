@@ -14,7 +14,7 @@
 | [TypeScript](https://github.com/microsoft/TypeScript) | 项目编译器；安装在已有开发依赖中。示例 `satisfies` 要求 TS 4.9+ |
 | [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) | `@types/react`、必要时 `@types/react-reconciler`；保持与现有声明/renderer 兼容 |
 | [Figwright](https://github.com/awdr74100/figwright) / [插件发行包](https://github.com/awdr74100/figwright/releases) | Agent 的 MCP 服务和 Figma 开发插件；二者选择匹配版本 |
-| [Node.js](https://github.com/nodejs/node) / [下载](https://nodejs.org/en/download) | Agent 侧工具运行环境；本目录 TS 脚本要求 Node 24.12+，与 UE 内嵌 JS 后端版本无关 |
+| [Node.js](https://github.com/nodejs/node) / [下载](https://nodejs.org/en/download) | Agent 侧工具运行环境；插件 scripts 中的 TS 脚本要求 Node 24.12+，与 UE 内嵌 JS 后端版本无关 |
 | [npm CLI](https://github.com/npm/cli) | 通常随 Node 安装；按工程 lockfile 恢复依赖 |
 | [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) | 可选 DesignBridge 采集器的直接依赖，由其 package/lockfile 安装；直接使用 MCP 客户端无需手动安装 SDK |
 | [Python](https://github.com/python/cpython) / [Pillow](https://github.com/python-pillow/Pillow) | 可选像素对比环境；现有 Python 比较脚本需要 Pillow |
@@ -30,7 +30,7 @@
 3. 在已有 package.json 所在目录运行 `npm ci`（有锁文件）或 `npm install`（无锁文件）。新工程先依据 ReactUMG 版本填写 React、react-reconciler、TypeScript 和类型依赖，再锁定版本。
 4. 保持一个主 tsconfig 和现有路径映射；确认 JSX、`ue`、`react-umg` 和 `react` 类型可解析，outDir 与实际 PuerTS 模块加载位置一致。
 
-已存在的工程配置是版本依据。ReactUMG 上游仓库**不保证包含**本地扩展 `Tools/DesignBridge`、`jsx-props.ts` 或截图辅助模块；没有这些扩展时，使用 Figwright MCP 读取、直接编写 TSX，并沿用工程资产导入与运行方式。
+已存在的工程配置是版本依据。ReactUMG 上游仓库**不保证包含**本地扩展 `scripts/Figwright`、`jsx-props.ts` 或截图辅助模块；没有这些扩展时，使用 Figwright MCP 读取、直接编写 TSX，并沿用工程资产导入与运行方式。
 
 ## 2. 准备 Figwright
 
@@ -39,20 +39,22 @@
 如果已有包含 DesignBridge 扩展的 ReactUMG 检出，可在该插件根目录运行：
 
 ```powershell
-./Tools/DesignBridge/setup-figwright.ps1
-node Tools/DesignBridge/figwright/read.mjs serve
+./scripts/Figwright/setup-figwright.ps1
+node scripts/Figwright/figwright/read.mjs serve
 ```
 
 Setup 会安装工具锁定依赖并准备匹配的开发插件。仅使用 Codex 且希望修改其 MCP 注册时才添加 `-RegisterCodex`。根据脚本输出导入 manifest；若已有 relay，先检查状态，不重复启动。此路径可能包含额外几何字段补丁，不要换成原版插件后假定字段仍存在。
 
 ## 3. 使用固化 TS 脚本
 
-这些脚本是 Agent 在宿主机运行的 CLI，不是 PuerTS 游戏脚本。Node 24.12+ 可以直接执行这里使用的可擦除 TS 语法；无需 ts-node、tsx 或额外 npm 安装。Node 执行时不做类型检查、不读取工程 tsconfig；`compile.ts` 会显式调用项目 tsc。见 [Node TypeScript 说明](https://nodejs.org/api/typescript.html)。
+文件已迁到 [Plugins/ReactUMG/scripts](../../../../Plugins/ReactUMG/scripts/)，本文不再附带脚本副本。底层工具位于 `scripts/Figwright`；TS 助手及验证入口合并于 `TypeScript/ReactUMGTest`，C++ 验证模块为 `Source/ReactUMGTest`。
 
-在工程根目录设定脚本位置；若复制了技能目录，请修改 `$scripts`：
+这些脚本是 Agent 在宿主机运行的 CLI，不是 PuerTS 游戏脚本。Node 24.12+ 可以直接执行插件 scripts 中使用的可擦除 TS 语法；无需 ts-node、tsx 或额外 npm 安装。Node 执行时不做类型检查、不读取工程 tsconfig；`compile.ts` 会显式调用项目 tsc。见 [Node TypeScript 说明](https://nodejs.org/api/typescript.html)。
+
+在工程根目录设定插件脚本位置；插件不在默认位置时修改 `$scripts`：
 
 ```powershell
-$scripts = 'Docs/02_DevelopmentRules/PuerTS/ReactUMG/scripts'
+$scripts = 'Plugins/ReactUMG/scripts'
 node "$scripts/doctor.ts" --project .
 node "$scripts/compile.ts" --project .
 ```
@@ -64,7 +66,7 @@ node "$scripts/compile.ts" --project .
 | `bridge.ts` | 调用已安装的 DesignBridge 工具，支持 `--plugin <目录>`；不自动安装、不自动重试、不另建转换器。缺少扩展时明确失败 |
 | `common.ts` | 内部参数与子进程辅助；参数数组传递，不拼接 shell 命令 |
 
-共同约定：`--project` 默认当前目录；插件默认 `Plugins/ReactUMG`；编译器从 `TypeScript/node_modules` 或根 `node_modules` 查找。使用 `--help` 查看入口。失败返回非零状态；子进程退出码原样保留。脚本配置保留在本目录，不改游戏 tsconfig。
+共同约定：`--project` 默认当前目录；插件默认 `Plugins/ReactUMG`；编译器从 `TypeScript/node_modules` 或根 `node_modules` 查找。使用 `--help` 查看入口。失败返回非零状态；子进程退出码原样保留。脚本配置保留在插件 scripts/package.json，不改游戏 tsconfig。
 
 ### Figwright → 离线包 → 生成代码
 
@@ -92,7 +94,7 @@ node "$scripts/bridge.ts" --project . --action import -- -Project YourProject.up
 node "$scripts/compile.ts" --project . --emit
 ```
 
-默认使用 `powershell.exe`；需要 PowerShell 7 时在 `--` 前传 `--powershell pwsh`。导入会启动 UE 并写资产，编译会写 JS，按当前任务授权使用。随后由现有游戏入口加载本次页面；本组脚本不假设工程有 DesignBridgeEditor 或特定截图入口。
+默认使用 `powershell.exe`；需要 PowerShell 7 时在 `--` 前传 `--powershell pwsh`。导入会启动 UE 并写资产，编译会写 JS，按当前任务授权使用。随后由现有游戏入口加载本次页面；本组脚本不假设工程有 ReactUMGTest 或特定截图入口。
 
 ## 4. 可选像素验证
 
