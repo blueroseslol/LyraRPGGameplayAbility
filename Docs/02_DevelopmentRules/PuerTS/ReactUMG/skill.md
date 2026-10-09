@@ -13,6 +13,7 @@ description: 指导 AI Agent 通过 Figwright 获取 Figma 节点、布局与资
 
 - 连接、定位设计、读取节点与导出资源：[Figwright 采集](figwright-integration.md)。
 - 控件映射、布局、资源接入与验证：[实现与验证](usage-and-validation.md)。
+- 编写时遇到 Slot、颜色、ref 或更新问题：[ReactUMG 编写补充](../Skills/ReactUMGUsageSkill/Create/guide.md)。
 
 ## 执行流程
 

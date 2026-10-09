@@ -21,12 +21,13 @@ Puerts 已集成后使用本 Skill。项目初始化、插件安装、GameInstan
 | 基础 UObject、UPROPERTY、UFUNCTION、struct、ref/out、Blueprint、delegate | `references/QuickStart.md` |
 | UE latent action、异步加载封装 Promise | `references/AsyncTest.md`、`references/AsyncUtils.md` |
 | 容器创建、容器边界、Mocha 用例 | `references/NewContainer.md`、`references/CaseTest.md`、`references/MyAssert.md` |
+| JS 数组/TArray 边界、React ref 与 `$ref` 区分 | [TArray](references/NewContainer.md)、[Ref](references/Ref.md) |
 | 在 Puerts 中跑测试或把结果显示到 UMG | `references/RunCaseTest.md`、`references/RunCaseTestAndDisplay.md` |
 | `cpp` 直绑 C++、`ffi` 函数指针、性能对比、JIT 导出 | `references/CDataTest.md`、`references/FFITest.md`、`references/PerfTest.md`、`references/JitTest.md` |
 | 覆盖 Blueprint/native 方法、维护旧 `makeUClass` | `references/UsingMixin.md`、`references/UsingMakeUClass.md` |
 | UMG Widget Blueprint | `references/UsingWidget.md` |
-| React UMG 业务 UI | `references/UsingReactUMG.md`、`references/main-ui-index.md`、`references/main-ui-ui-components.md` |
-| React UMG renderer 内部实现 | `references/react-umg.md` |
+| React UMG 业务 UI | [编写补充](../ReactUMGUsageSkill/Create/guide.md)；完整示例仍查 `references/UsingReactUMG.md`、`references/main-ui-index.md`、`references/main-ui-ui-components.md` |
+| React UMG renderer 内部实现或刷新异常 | [诊断补充](../ReactUMGUsageSkill/Debug/guide.md)；历史实现参考 `references/react-umg.md`，以当前源码为准 |
 
 ## 最小规则
 

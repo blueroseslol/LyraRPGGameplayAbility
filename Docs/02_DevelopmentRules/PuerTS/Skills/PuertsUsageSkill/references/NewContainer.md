@@ -22,6 +22,19 @@ const map = UE.NewMap(UE.BuiltinString, UE.BuiltinInt);
 
 ## 使用边界
 
-- 创建后的对象按 `UE.TArray<T>`、`UE.TSet<T>`、`UE.TMap<K,V>` 使用；基础读写查 `QuickStart.md` 的 UE Containers。
+- 创建后的对象按 `UE.TArray<T>`、`UE.TSet<T>`、`UE.TMap<K,V>` 使用；基础读写查 [QuickStart.md](QuickStart.md) 的 UE Containers。
 - 类型描述符来自 `Typing/ue/puerts.d.ts` 的 `SupportedContainerKVType`，不要随便传字符串类型名。
 - 需要边界行为、越界和 64 位整型示例时查 `CaseTest.md`。
+
+## TArray 读写
+
+业务数据可用 JS 数组；UE 参数要求 `TArray<T>` 时，用 `UE.NewArray` 创建，不用类型断言代替转换。
+
+```ts
+const values = UE.NewArray(UE.BuiltinFloat);
+values.Add(1, 2);
+values.Get(0); // 1
+```
+
+- 读写用 `Get/Set`，长度用 `Num()`，不用下标或 `.length`。
+- ReactUMG 的 `ColumnFill/RowFill` 同样适用；容器变化不代表 UI 自动刷新。
