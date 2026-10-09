@@ -1,0 +1,7 @@
+{
+    "npm.exclude": [
+    "**/Content/**",
+    "**/Plugins/**",
+    "**/Docs/**"
+  ],
+}
