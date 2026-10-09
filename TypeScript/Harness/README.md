@@ -4,6 +4,20 @@
 
 ## 运行
 
+在 `TypeScript` 目录运行全部四组测试：
+
+```powershell
+cd D:\MatrixTA\LyraRPGGameplayAbility\TypeScript
+npm test
+```
+
+依次运行 Automation Spec、Functional Test、Automation Driver、Puerts / Lyra TypeScript。
+复用软链接所指 UnrealHarness 仓库的 Vitest 配置与依赖，固定目标为本 Lyra 工程；Puerts 测试前自动编译 TS。
+任一组失败则命令返回非零退出码，每组输出报告目录。需已编译 LyraEditor；不会自动构建 C++。
+引擎使用 UnrealHarness 的 `.harness-local.json`，也可通过 `HARNESS_ENGINE` 环境变量指定。
+
+仅运行 Puerts 组：`npm test -- -t Puerts`。
+
 在 Lyra 工程根目录执行：
 
 ```powershell

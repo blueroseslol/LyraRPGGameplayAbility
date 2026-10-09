@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "TypeScript gameplay scripts for Lyra, running on Puerts (Node.js backend)",
   "scripts": {
+    "test": "node Harness/test.cjs",
     "build": "tsc -p ../tsconfig.json",
     "watch": "tsc -p ../tsconfig.json --watch"
   },
