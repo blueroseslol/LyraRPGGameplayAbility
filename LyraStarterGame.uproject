@@ -380,6 +380,10 @@
 			"Enabled": true
 		},
 		{
+			"Name": "ModelContextProtocol",
+			"Enabled": true
+		},
+		{
 			"Name": "PlayerInputDebugger",
 			"Enabled": true,
 			"TargetAllowList": [

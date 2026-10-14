@@ -114,7 +114,7 @@ var global = global || (function () { return this; }());
             let forceReload = false;
             if ((moduleName in localModuleCache)) {
                 let m = localModuleCache[moduleName];
-                if (!m.__forceReload) {
+                if (m && !m.__forceReload) {
                     return localModuleCache[moduleName].exports;
                 } else {
                     forceReload = true;
@@ -137,7 +137,7 @@ var global = global || (function () { return this; }());
             }
             
             let key = fullPath;
-            if ((key in moduleCache) && !forceReload) {
+            if (moduleCache[key] && !forceReload) {
                 localModuleCache[moduleName] = moduleCache[key];
                 return localModuleCache[moduleName].exports;
             }
@@ -208,7 +208,7 @@ var global = global || (function () { return this; }());
         }
         let reloaded = false;
         for(var moduleKey in moduleCache) {
-            if (!reloadModuleKey || (reloadModuleKey == moduleKey)) {
+            if (moduleCache[moduleKey] && (!reloadModuleKey || (reloadModuleKey == moduleKey))) {
                 moduleCache[moduleKey].__forceReload = true;
                 reloaded = true;
                 if (reloadModuleKey) break;
