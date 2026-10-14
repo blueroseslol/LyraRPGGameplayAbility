@@ -16,6 +16,22 @@
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Gameplay_AbilityInputBlocked, "Gameplay.AbilityInputBlocked");
 
+bool ULyraAbilitySystemComponent::SetAbilityInputTag(FGameplayAbilitySpecHandle Handle, FGameplayTag InputTag, bool bAdd)
+{
+	if (!IsOwnerActorAuthoritative() || !InputTag.IsValid())
+	{
+		return false;
+	}
+	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(Handle))
+	{
+		if (bAdd) Spec->GetDynamicSpecSourceTags().AddTag(InputTag);
+		else Spec->GetDynamicSpecSourceTags().RemoveTag(InputTag);
+		MarkAbilitySpecDirty(*Spec);
+		return true;
+	}
+	return false;
+}
+
 ULyraAbilitySystemComponent::ULyraAbilitySystemComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {

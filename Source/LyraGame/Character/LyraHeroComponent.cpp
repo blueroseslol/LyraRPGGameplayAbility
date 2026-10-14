@@ -303,6 +303,10 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 
 void ULyraHeroComponent::AddAdditionalInputConfig(const ULyraInputConfig* InputConfig)
 {
+	if (!InputConfig || !IsReadyToBindInputs() || AdditionalInputBindings.Contains(InputConfig))
+	{
+		return;
+	}
 	TArray<uint32> BindHandles;
 
 	const APawn* Pawn = GetPawn<APawn>();
@@ -326,13 +330,30 @@ void ULyraHeroComponent::AddAdditionalInputConfig(const ULyraInputConfig* InputC
 		if (ensureMsgf(LyraIC, TEXT("Unexpected Input Component class! The Gameplay Abilities will not be bound to their inputs. Change the input component to ULyraInputComponent or a subclass of it.")))
 		{
 			LyraIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
+			AdditionalInputBindings.Add(InputConfig, MoveTemp(BindHandles));
 		}
 	}
 }
 
 void ULyraHeroComponent::RemoveAdditionalInputConfig(const ULyraInputConfig* InputConfig)
 {
-	//@TODO: Implement me!
+	if (TArray<uint32>* Handles = AdditionalInputBindings.Find(InputConfig))
+	{
+		if (const APawn* Pawn = GetPawn<APawn>())
+		{
+			if (ULyraInputComponent* Input = Pawn->FindComponentByClass<ULyraInputComponent>())
+			{
+				Input->RemoveBinds(*Handles);
+			}
+		}
+		AdditionalInputBindings.Remove(InputConfig);
+	}
+}
+
+int32 ULyraHeroComponent::GetAdditionalInputBindingCount(const ULyraInputConfig* InputConfig) const
+{
+	const TArray<uint32>* Handles = AdditionalInputBindings.Find(InputConfig);
+	return Handles ? Handles->Num() : 0;
 }
 
 bool ULyraHeroComponent::IsReadyToBindInputs() const

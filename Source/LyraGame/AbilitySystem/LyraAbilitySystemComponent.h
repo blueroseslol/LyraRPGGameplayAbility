@@ -50,6 +50,10 @@ public:
 	UE_API void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	UE_API void ClearAbilityInput();
 
+	/** 修改实际 AbilitySpec 并标记复制；输入编排策略由调用方负责。 */
+	UFUNCTION(BlueprintCallable, Category = "Lyra|Abilities")
+	UE_API bool SetAbilityInputTag(FGameplayAbilitySpecHandle Handle, FGameplayTag InputTag, bool bAdd);
+
 	UE_API bool IsActivationGroupBlocked(ELyraAbilityActivationGroup Group) const;
 	UE_API void AddAbilityToActivationGroup(ELyraAbilityActivationGroup Group, ULyraGameplayAbility* LyraAbility);
 	UE_API void RemoveAbilityFromActivationGroup(ELyraAbilityActivationGroup Group, ULyraGameplayAbility* LyraAbility);

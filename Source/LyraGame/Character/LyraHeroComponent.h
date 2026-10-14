@@ -48,12 +48,18 @@ public:
 	UE_API void ClearAbilityCameraMode(const FGameplayAbilitySpecHandle& OwningSpecHandle);
 
 	/** Adds mode-specific input config */
+	UFUNCTION(BlueprintCallable, Category = "Lyra|Input")
 	UE_API void AddAdditionalInputConfig(const ULyraInputConfig* InputConfig);
 
 	/** Removes a mode-specific input config if it has been added */
+	UFUNCTION(BlueprintCallable, Category = "Lyra|Input")
 	UE_API void RemoveAdditionalInputConfig(const ULyraInputConfig* InputConfig);
 
+	UFUNCTION(BlueprintPure, Category = "Lyra|Input")
+	UE_API int32 GetAdditionalInputBindingCount(const ULyraInputConfig* InputConfig) const;
+
 	/** True if this is controlled by a real player and has progressed far enough in initialization where additional input bindings can be added */
+	UFUNCTION(BlueprintPure, Category = "Lyra|Input")
 	UE_API bool IsReadyToBindInputs() const;
 	
 	/** The name of the extension event sent via UGameFrameworkComponentManager when ability inputs are ready to bind */
@@ -103,6 +109,9 @@ protected:
 
 	/** True when player input bindings have been applied, will never be true for non - players */
 	bool bReadyToBindInputs;
+
+	// 保留实际绑定句柄，允许精确移除附加配置而不影响默认输入。
+	TMap<TWeakObjectPtr<const ULyraInputConfig>, TArray<uint32>> AdditionalInputBindings;
 };
 
 #undef UE_API
