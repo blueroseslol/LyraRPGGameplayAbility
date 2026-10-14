@@ -12,5 +12,8 @@
     "react-reconciler": "0.23.0",
     "scheduler": "0.17.0",
     "fastify": "4.29.1"
+  },
+  "overrides": {
+    "toad-cache": "3.4.1"
   }
 }
