@@ -36,7 +36,8 @@
   "include": [
     "TypeScript/**/*.ts",
     "TypeScript/**/*.tsx",
-    "Plugins/EasyEditorPlugin/TypeScript/Runtime/**/*.ts",
+    "Plugins/AITA/TypeScript/Runtime/**/*.ts",
+    "Plugins/AITA/TypeScript/Editor/**/*.ts",
     "Plugins/ReactUMG/TypeScript/ReactUMGTest/**/*"
   ],
   "exclude": [

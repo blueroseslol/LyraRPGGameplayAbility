@@ -1,7 +1,7 @@
 import * as UE from 'ue';
 import { argv } from 'puerts';
 import { loadFigwrightCover } from './UI/FigwrightCover';
-import { pluginGreeting } from '../Plugins/EasyEditorPlugin/TypeScript/Runtime';
+import { pluginGreeting } from '../Plugins/AITA/TypeScript/Runtime';
 
 const gameInstance = argv.getByName("GameInstance") as UE.GameInstance;
 const world = gameInstance?.GetWorld();

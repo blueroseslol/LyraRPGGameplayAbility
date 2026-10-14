@@ -1,0 +1,16 @@
+{
+  "name": "lyra-puerts-javascript",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "js-tokens": "4.0.0",
+    "loose-envify": "1.4.0",
+    "object-assign": "4.1.1",
+    "prop-types": "15.8.1",
+    "react": "16.14.0",
+    "react-is": "16.13.1",
+    "react-reconciler": "0.23.0",
+    "scheduler": "0.17.0",
+    "fastify": "4.29.1"
+  }
+}
