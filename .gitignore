@@ -10,3 +10,7 @@ Build
 *.slnx
 Content/JavaScript/PuertsEditor/node_modules/
 ts_file_versions_info.json
+/.codex-tmp/
+Docs/.claudian
+.claude
+Docs/ultracode
