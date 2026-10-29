@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "04_Lyra/Lyra项目结构与模块逻辑.md",
+                "file": "04_Lyra/UI/前言.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Lyra项目结构与模块逻辑"
+              "title": "前言"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "文件列表"
@@ -164,13 +166,34 @@
               "icon": "lucide-list",
               "title": "Lyra项目结构与模块逻辑 的大纲"
             }
+          },
+          {
+            "id": "7569aee331a07cb5",
+            "type": "leaf",
+            "state": {
+              "type": "claudian-view",
+              "state": {
+                "tabWorkspace": {
+                  "version": 1,
+                  "openTabs": [
+                    {
+                      "tabId": "tab-1792401482892-nwzc6gv",
+                      "conversationId": "conv-1792401548576-jfmkn2zdg"
+                    }
+                  ],
+                  "activeTabId": "tab-1792401482892-nwzc6gv"
+                }
+              },
+              "icon": "bot",
+              "title": "Claudian"
+            }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -182,29 +205,32 @@
       "command-palette:打开命令面板": false,
       "bases:新建数据库": false,
       "obsidian-excalidraw-plugin:新建绘图文件": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "realclaudian:Open Claudian": false
     }
   },
-  "active": "d6c5421fb4369a33",
+  "active": "7569aee331a07cb5",
   "lastOpenFiles": [
+    "04_Lyra/UI/前言.md.tmp.79040.848a0a119b3e",
+    "04_Lyra/UI/UI.md.tmp.64540.563a858b6210",
+    "04_Lyra/UI/UI.md.tmp.64540.7a16bd183282",
+    "04_Lyra/Lyra GAS.md",
+    "04_Lyra/UI/前言.md",
+    "04_Lyra/UI",
+    "04_Lyra/Lyra GameFeature.md",
+    "04_Lyra/Lyra项目结构与模块逻辑.md",
     "03_UEFeatureDocs/GASDocument_EN.md",
     "04_Lyra/Lyra Game流程.md.tmp.41820.50fcb61de7be",
     "04_Lyra/Lyra Game流程.md",
-    "04_Lyra/Lyra项目结构与模块逻辑.md",
-    "04_Lyra/Lyra GAS.md",
     "04_Lyra/Network",
     "04_Lyra/Inventory/Item & Weapon.md",
     "04_Lyra/Inventory",
     "未命名",
     "04_Lyra/Lyra GAS.md.tmp.41820.4314d4599e1a",
-    "04_Lyra/Lyra GameFeature.md",
     "03_UEFeatureDocs/GameFeature.md",
     "03_UEFeatureDocs/GASDocument_CN.md",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/ReactUMG",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/Puerts/ThirdParty/v8_for_ue424_or_below/Lib/iOS/arm64/libv8_libsampler.a",
-    "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/Puerts/ThirdParty/v8_for_ue424_or_below/Lib/iOS/arm64/libv8_libplatform.a",
-    "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/Puerts/ThirdParty/v8_for_ue424_or_below/Lib/iOS/arm64/libv8_libbase.a",
-    "02_DevelopmentRules/PuerTS/puerts_unreal_demo/Plugins/Puerts/ThirdParty/v8_for_ue424_or_below/Lib/iOS/arm64/libv8_external_snapshot.a",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/node_modules/@types/react-reconciler/README.md",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/node_modules/@types/mocha/README.md",
     "02_DevelopmentRules/PuerTS/puerts_unreal_demo/node_modules/@types/react/README.md",
